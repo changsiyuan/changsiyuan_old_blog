@@ -7,8 +7,6 @@ tags : [intro, beginner]
 ---
 {% include JB/setup %}
 
-#{{page.title}}
-
 ##日常使用
 ###1.中文输入法
 **Settings**->**region and language**
