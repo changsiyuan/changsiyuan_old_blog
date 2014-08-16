@@ -10,7 +10,7 @@ markdown: rdiscount
 #markdown: redcarpet
 
 #for myself
-title :inotepad 
+title : inotepad 
 #tagline: Site Tagline
 author :
   name :
