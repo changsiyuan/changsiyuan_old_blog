@@ -7,7 +7,9 @@ tags : [intro, beginner]
 ---
 {% include JB/setup %}
 
+***
 ##日常使用
+***
 ###1.中文输入法
 **Settings**->**region and language**
 ###2.epel
@@ -25,9 +27,9 @@ yum install ntfs-3g
 修改.vimrc
 ###9.goagent
 
-
-
+***
 ##开发环境
+***
 ###1.
 ```
 yum update
