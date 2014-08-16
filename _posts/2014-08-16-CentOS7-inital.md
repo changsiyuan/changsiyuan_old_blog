@@ -1,10 +1,13 @@
 ---
-layout: post
+layout : post
+title : CentOS 7 安装后的配置
 category : other
-tagline: "Supporting tagline"
+tagline : "Supporting tagline"
 tags : [intro, beginner]
 ---
 {% include JB/setup %}
+
+#{{page.title}}
 
 ##日常使用
 ###1.中文输入法

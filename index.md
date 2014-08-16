@@ -17,7 +17,7 @@ title: Welcome to inotepad
         </div>
 
         <div class="read-more"><a class="post_title" href="{{ post.url }}">
-        不信你打开 >></a></div>
+        继续阅读 >></a></div>
 
         <div class="arrow-time">
             <cite>{{ post.date | date_to_long_string }}</cite>
