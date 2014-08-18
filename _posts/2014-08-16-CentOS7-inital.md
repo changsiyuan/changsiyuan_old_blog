@@ -3,7 +3,7 @@ layout : post
 title : CentOS 7 安装后的配置
 category : other
 tagline : "Supporting tagline"
-tags : [intro, beginner]
+tags : [CentOS]
 ---
 {% include JB/setup %}
 
