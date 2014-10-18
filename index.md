@@ -13,7 +13,7 @@ title: Welcome to inotepad
         <h1><a class="post_title" href="{{ post.url }}">{{post.title}}</a></h1>
 
         <div class="caption rich-content">
-            {{ post.content | split: '<!--more-->' | first }}
+            {{ post.content | first }}
         </div>
 
         <div class="read-more"><a class="post_title" href="{{ post.url }}">
