@@ -42,9 +42,11 @@ MapReduce分为以下几个阶段（TaskStatus）
 3. 为什么要排序，如何实现的排序？
 4. 什么是merge，为什么要merge,merge和spill有什么关系？
 5. map reduce combine有什么关系？
+
 ***
 ##3.本系列的顺序
 ***
+
 ####map
 * map的输入TextInputFormat
 * map的数据处理流程Mapper、MapTask
