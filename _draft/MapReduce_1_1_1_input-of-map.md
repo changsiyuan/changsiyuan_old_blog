@@ -11,12 +11,14 @@
 
 ![TextInputFormat](/_image/1.TextInputFormat.png)
 
-可以看出来InputFormat就是一个抽象的基类。
-FileInputFormat实现了一个重要的方法getSplit()。这个方法将一个文件进行分割。
-而TextInputFormat则仅仅是使用createRecordReader创建了一个对象，该对象是负责把Split变成生成(K,V)的。可以知道这个对象是LineRecordReader类
-这里首先看一下LineRecordReader中使用的一个辅助类LineReader
-LineReader的作用就是从一个文件流中读取一行，就是方法readLine()。这里呢，不对输入做任何的假设，就是当作一个完整的文件读取出一行，处理行的分界线和Split的分界线不同是在LineRecordReader中处理的
-回来看LineRecordReader
+* 可以看出来InputFormat就是一个抽象的基类。
+* FileInputFormat实现了一个重要的方法getSplit()。这个方法将一个文件进行分割。
+* 而TextInputFormat则仅仅是使用createRecordReader创建了一个对象，该对象是负责把Split变成生成(K,V)的。可以知道这个对象是LineRecordReader类
+* 这里首先看一下LineRecordReader中使用的一个辅助类LineReader
+* LineReader的作用就是从一个文件流中读取一行，就是方法readLine()。
+* 这里呢，不对输入做任何的假设，就是当作一个完整的文件读取出一行，处理行的分界线和Split的分界线不同是在LineRecordReader中处理的
+
+###LineRecordReader
 initialize()
 
 ```
@@ -41,9 +43,9 @@ while (pos < end) {
       }
 ```
 
-读取的停止条件可以看出，每次都是读取完整的一行的，即使是超过了Split的边界(其实这个边界就是相当于是一个约定而已，可以做稍微的调整)。
-那么，假设有邻近的两块，第二块的开头已经被读过了，那么怎么保证不重复读取呢？第二块跳过第一个'\n'之前的内容。
-但是如果是第一块呢，不应该跳过，那么就不跳。结果就是initialize()中的判断是否跳过第一个'\n'之前的内容。
-注意，第一个'\n'之前的内容和第一行也不同，一行的内容应该是完整的，但是第二块中的第一行可能一部分在第一块的末尾，一部分在第二块的开头.
-initialize()和getKeyValue()对不同Map处理的内容做了微微调整，基本上保证了每个Split由一个Map处理的语义。
+* 读取的停止条件可以看出，每次都是读取完整的一行的，即使是超过了Split的边界(其实这个边界就是相当于是一个约定而已，可以做稍微的调整)。
+* 那么，假设有邻近的两块，第二块的开头已经被读过了，那么怎么保证不重复读取呢？第二块跳过第一个'\n'之前的内容。
+* 但是如果是第一块呢，不应该跳过，那么就不跳。结果就是initialize()中的判断是否跳过第一个'\n'之前的内容。
+* 注意，第一个'\n'之前的内容和第一行也不同，一行的内容应该是完整的，但是第二块中的第一行可能一部分在第一块的末尾，一部分在第二块的开头.
+* initialize()和getKeyValue()对不同Map处理的内容做了微微调整，基本上保证了每个Split由一个Map处理的语义。
 
