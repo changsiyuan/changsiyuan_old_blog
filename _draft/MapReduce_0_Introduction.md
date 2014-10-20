@@ -22,7 +22,9 @@ MapReduce分为以下几个阶段（TaskStatus）
 * REDUCE
 * CLEANUP
 
-其中SHUFFLE最为复杂，这也最重要的地方。
+其中SHUFFLE PHASE最为复杂，这也最重要的地方。
+
+关于SHUFFLE这里是一种说法,还有就是说从MAP输出后到REDUCE开始这之间都是SHUFFLE。那么，之后如果提到第一种，就称为SHUFFLE PHASE，第二种直接称为SHUFFLE。
 
 ####WordCount为例，处理的流程
 
