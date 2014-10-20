@@ -8,6 +8,7 @@
 * 那么问题来了，Split是直接按照大小分的，而每行则是按照'\n'(UNIX风格)来划分的，这两者之间的分界线显然不是相同的，如何处理这两者的不同呢？
 
 ###类之间的关系以及功能
+
 ![TextInputFormat](_image/1.TextInputFormat.png)
 
 可以看出来InputFormat就是一个抽象的基类。
