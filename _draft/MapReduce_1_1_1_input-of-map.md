@@ -9,7 +9,7 @@
 
 ###类之间的关系以及功能
 
-![TextInputFormat](_image/1.TextInputFormat.png)
+![TextInputFormat](/_image/1.TextInputFormat.png)
 
 可以看出来InputFormat就是一个抽象的基类。
 FileInputFormat实现了一个重要的方法getSplit()。这个方法将一个文件进行分割。
