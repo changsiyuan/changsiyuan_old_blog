@@ -40,18 +40,18 @@ public void run(Context context) throws IOException, InterruptedException {
 
 **我们已经看到了Mapper是如何运行的，那么它Mapper对象什么时候生成的呢？**
 
-**下面请看MapTask如何一步步实例化为一个运行对象的，并且建立了相应的输入和输出环境**
+**下面请看MapTask如何一步步创建Mapper对象，并且建立了相应的输入和输出对象的**
 
 ***
 ##三、Mapper的实例化
 （来自org.apache.hadoop.mapred.MapTask）
 ***
 重点就runNewMapper方法，这方法的内容很多，但是做的事就是先做一些初始化的操作，然后启动mapper
-  
+ 
   初始化的时候使用到了反射机制，反射机制具体是什么样子的这里就不解释了。只需知道，有些类是要在运行的时候才知道是什的类，然后使用这些类，反射机制就可以实现这个功能。可以在其中看到一些get**class方法，如果这些类没有设置，就使用默认，如果使用过了就使用设置的类。
-  
+ 
   在构造mapperContext中，更要使用contextConstructor来得到一个新的实例。
-  
+
   总之
 
  ```
