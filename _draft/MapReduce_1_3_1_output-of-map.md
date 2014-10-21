@@ -56,8 +56,8 @@ public void write(K key, V value) throws IOException, InterruptedException {
 ***
 ###Spill
 ***
-**spillThread调用的是sortAndSpill()**
-* 先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
+* spillThread调用的是sortAndSpill()
+* sort就是先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
 * 然后使用MergeQueue写入硬盘。
 
 ####Sort的设计
@@ -72,3 +72,4 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 在这里就知道他是可以把多个溢写的文件合并成一个文件
  * 之前的多个文件是先按照partition来排序，partition相同的则按照key来排序的
  * 新的文件是也是先按照partition来排序，partition相同的则按照key来排序的一个文件
+ * 也就是说merge包含由排序和合并文件两个功能。
