@@ -69,7 +69,7 @@ IFile类
 
 ####溢写文件的结构
 图片来源：http://www.cnblogs.com/OnlyXP/archive/2009/05/25/1488811.html
-![spillFile](/_image/spillFile)
+![spillFile](/_image/spillFile.png)
 
 ####combiner
 
