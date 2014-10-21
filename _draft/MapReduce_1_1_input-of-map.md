@@ -89,6 +89,7 @@ newSize = in.readLine(value, maxLineLength,
   }
 ```
 * 至于getCurrentKey()或者getCurrentValue()则更加简单。
+
 ####处理边界不一致的问题
 
 ```
