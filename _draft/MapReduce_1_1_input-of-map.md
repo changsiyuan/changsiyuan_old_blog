@@ -17,8 +17,9 @@
 * FileInputFormat实现了一个重要的方法getSplits()。这个方法将一个文件进行分割成不同的Split。
 * 而TextInputFormat则仅仅是使用createRecordReader创建了一个对象，该对象是负责把Split变成生成(K,V)的。可以知道这个对象是LineRecordReader类
 * 不过，首先看一下LineRecordReader中使用的一个辅助类LineReader
-* LineReader的作用就是从一个文件流中读取一行，读出来的这一行当然就是作为V了，行的第一个字母所在的字节数就是K，这样得到了一个(K,V)。
-* 处理行的分界线和Split的分界线不同是在LineRecordReader中处理的。
+* LineReader的作用就是从一个文件流中读取一行，至于这些数据如何变成(K,V)的和这个类是没有关系的。
+* LineRecordReader中的nextKeyValue()通过LineReader获取数据，然后封装为(K,V),并且提供了getCurrentKey()和getCurrentValue()来分别获得K和V的值。
+* LineRecordReader通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
 
 ***
 ###FileInputFormat
@@ -53,8 +54,8 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
   }
 ```
 * createRecordReader就是创建了一个新的LineRecordReader对象。
-* 这里的这种设计方式，使得实现一个自己的RecordReader非常方便。
-* isSplitable所名是否可以Split，毕竟有的是不可以分割的。
+* 这种设计方式，使得实现一个自己的RecordReader非常方便。
+* isSplitable说明是否可以Split，毕竟有的是不可以分割的，比如压缩文件。
 * 这个类的主要目的就是实现这么一个通用的借口，可以非常方便的修改。
 
 ***
@@ -68,18 +69,38 @@ readLine方法主要是实现了从一个流中读出一行来
 ***
 ###LineRecordReader
 ***
-* 通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
-initialize()
+####把数据封装称(K,V)
+```
+nextKeyValue()部分代码
+key.set(pos);
+newSize = in.readLine(value, maxLineLength,
+                             Math.max((int)Math.min(Integer.MAX_VALUE, end-pos),
+                                                                  maxLineLength));
+```
+* LineRecordReader中的nextKeyValue()通过LineReader获取数据，然后封装为(K,V),并且提供了getCurrentKey()和getCurrentValue()来分别获得K和V的值。
+* 上面的代码只是nextKeyValue中赋值的两句，可以看出来，K是第几个字节数，V是读入的行的内容
+```
+  public LongWritable getCurrentKey() {
+      return key;
+  }
+
+  public Text getCurrentValue() {
+      return value;
+  }
+```
+* 至于getCurrentKey()或者getCurrentValue()则更加简单。
+####处理边界不一致的问题
 
 ```
+initialize()部分代码
 if (skipFirstLine) {  // skip first line and re-establish "start".
   istart += in.readLine(new Text(), 0,
   (int)Math.min((long)Integer.MAX_VALUE, end - start));
 }
 ```
-nextKeyValue()
 
 ```
+nextKeyValue()部分代码
 while (pos < end) {
       newSize = in.readLine(value, maxLineLength,
                             Math.max((int)Math.min(Integer.MAX_VALUE, end-pos),
@@ -94,6 +115,7 @@ while (pos < end) {
 }
 ```
 
+* 通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
 * 读取的停止条件可以看出，每次都是读取完整的一行的，即使是超过了Split的边界(其实这个边界就是相当于是一个约定而已，可以做稍微的调整)。
 * 那么，假设有邻近的两块，第二块的开头已经被读过了，那么怎么保证不重复读取呢？第二块跳过第一个'\n'之前的内容。
 * 但是如果是第一块呢，不应该跳过，那么就不跳。结果就是initialize()中的判断是否跳过第一个'\n'之前的内容。
