@@ -128,4 +128,6 @@ MapOutputCollector<K,V> collector;
 collector = new MapOutputBuffer<K,V>(umbilical, job, reporter);
 ```
 
-这里可以看出来最终是使用的MapOutputBuffer中的collect()，直接写入了缓存中
+这里可以知道了最终是使用的MapOutputBuffer中的collect()，直接写入了缓存中
+
+之后，我们就要开始看MapOutputBuffer是如何处理这些数据的。
