@@ -46,7 +46,7 @@ public void run(Context context) throws IOException, InterruptedException {
 ##三、Mapper的实例化
 （来自org.apache.hadoop.mapred.MapTask）
 ***
-重点就runNewMapper方法，这方法的内容很多，但是做的事就是先做一些初始化的操作，然后启动mapper
+**重点是runNewMapper方法**，这方法的内容很多，但是做的事就是先做一些初始化的操作，然后启动mapper
  
   初始化的时候使用到了反射机制，反射机制具体是什么样子的这里就不解释了。只需知道，有些类是要在运行的时候才知道是什的类，然后使用这些类，反射机制就可以实现这个功能。可以在其中看到一些get**class方法，如果这些类没有设置，就使用默认，如果使用过了就使用设置的类。
  
@@ -55,6 +55,7 @@ public void run(Context context) throws IOException, InterruptedException {
   总之
 
  ```
+runNewMapper()部分代码
 //一些初始化操作
       mapper.run(mapperContext);
 //清理工作
@@ -74,6 +75,7 @@ public void run(Context context) throws IOException, InterruptedException {
 (1)输入的方法InputFormat
 
 ```
+runNewMapper()部分代码
     // make the input format
     org.apache.hadoop.mapreduce.InputFormat<INKEY,INVALUE> inputFormat =
       (org.apache.hadoop.mapreduce.InputFormat<INKEY,INVALUE>)
@@ -88,6 +90,7 @@ public void run(Context context) throws IOException, InterruptedException {
 
 
 ```
+runNewMapper()部分代码
     org.apache.hadoop.mapreduce.RecordReader<INKEY,INVALUE> input =
       new NewTrackingRecordReader<INKEY,INVALUE>
           (split, inputFormat, reporter, job, taskContext);
@@ -98,13 +101,14 @@ public void run(Context context) throws IOException, InterruptedException {
 * 这个输入对象才能够读取文本，封装了键值对，提供nextKeyValue(),getCurrentkey()，getCurrentValue()等方法。
 
 ***
-##五、输出的实例
+##五、输出的实例化
 （来自org.apache.hadoop.mapred.MapTask）
 ***
 
 (1).输出的对象RecordWriter  out
 
 ```
+runNewMapper()部分代码
        // get an output object
       if (job.getNumReduceTasks() == 0) {
          output =
