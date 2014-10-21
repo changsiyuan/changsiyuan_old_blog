@@ -23,6 +23,7 @@
 
 ***
 ###FileInputFormat
+来自org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 ***
 * Split是什么呢？如果说你有一个西瓜，几个人一起吃，那么肯定要切开才能吃。
 
@@ -39,6 +40,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 
 ***
 ###TextIputFormat
+来自org.apache.hadoop.mapreduce.lib.input.TextInputFormat
 ***
 这里还是很简单的就是两个方法
 ```
@@ -60,6 +62,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 
 ***
 ###LineReader
+来自org.apache.hadoop.util.LineReader
 ***
 readLine方法主要是实现了从一个流中读出一行来
 * LineReader的作用就是从一个文件流中读取一行，就是方法readLine()。这里呢，不对输入做任何的假设，就是当作一个完整的文件读取出一行。
@@ -68,6 +71,7 @@ readLine方法主要是实现了从一个流中读出一行来
 
 ***
 ###LineRecordReader
+来自org.apache.hadoop.mapreduce.lib.input.LineRecordReader
 ***
 ####把数据封装称(K,V)
 ```

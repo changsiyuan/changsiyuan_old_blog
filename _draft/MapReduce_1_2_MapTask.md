@@ -16,8 +16,8 @@ public void run(Context context) throws IOException, InterruptedException {
 ```
 
 这个做了几件事情
-* 配置
-* 不断的读取下一个<K,V>，并交给map来处理
+* 做了一些配置
+* 不断的读取下一个<K,V>，并交给map来处理（这里其实就是RecordReader中实现的对应的getCurrentKey()和getCurrentValue()）
 
 ####以WordCount来举例，
 * 类LineRead可以从流中读取一行，类LineRecordReader将这一行变成一个键值对。
