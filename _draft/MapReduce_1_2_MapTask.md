@@ -67,9 +67,9 @@ public void run(Context context) throws IOException, InterruptedException {
 
 输入的方法和输入的对象的实例化是分开的，这个感觉有点奇怪。输入的对象难道使用输入的方法如何来输入内容呢？
 
-这里的差别来至于InputFormat实现的是将分为split，生成一个输入对象(到此为止，至于这个对象能够干什么，它不知道)
+这里的差别来至于InputFormat只有几个重要的功能：isSplitable(),getSplits()，createRecordReader()(这个就是new一个RecordReader对象，至于这个RecordReader对象能够干什么，它不知道)
 
-输入的对象则具体实现了将一个文件中的内容转换成了键值对
+输入的对象则具体实现了将一个文件中的内容转换成了键值对(比如LineRecordReader保证了将文本封装为(K,V),K是偏移字节数，V是每行的内容)
 
 (1)输入的方法InputFormat
 
@@ -95,7 +95,7 @@ public void run(Context context) throws IOException, InterruptedException {
 
 * NewTrackingRecordReader<INKEY,INVALUE>其实是对获得(K,V)的方法又进行了封装，增加了一些
 记录。
-* 这个输入对象才能够读取文本，生成键值对，提供获取key值，value值，读取下一个键值对的方法
+* 这个输入对象才能够读取文本，封装了键值对，提供nextKeyValue(),getCurrentkey()，getCurrentValue()等方法。
 
 ***
 ##五、输出的实例
@@ -136,4 +136,4 @@ collector = new MapOutputBuffer<K,V>(umbilical, job, reporter);
 
 收集的数据就是(key,value,partition)三个数据作为一个逻辑单元。至于为什么要加入partition,之后再解释。
 
-之后，我们就要开始看MapOutputBuffer是如何处理这些数据的。
+现在整体的架构已经清楚了，那么我们就要重点关注(K,V)在经过map处理之后又发生了什么。
