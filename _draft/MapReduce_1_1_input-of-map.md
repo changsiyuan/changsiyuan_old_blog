@@ -14,16 +14,27 @@
 ![TextInputFormat](/_image/1.TextInputFormat.png)
 
 * 可以看出来InputFormat就是一个抽象的基类。
-* FileInputFormat实现了一个重要的方法getSplit()。这个方法将一个文件进行分割成不同的Split。
+* FileInputFormat实现了一个重要的方法getSplits()。这个方法将一个文件进行分割成不同的Split。
 * 而TextInputFormat则仅仅是使用createRecordReader创建了一个对象，该对象是负责把Split变成生成(K,V)的。可以知道这个对象是LineRecordReader类
 * 不过，首先看一下LineRecordReader中使用的一个辅助类LineReader
-* LineReader的作用就是从一个文件流中读取一行，就是方法readLine()。这里呢，不对输入做任何的假设，就是当作一个完整的文件读取出一行。
+* LineReader的作用就是从一个文件流中读取一行，读出来的这一行当然就是作为V了，行的第一个字母所在的字节数就是K，这样得到了一个(K,V)。
 * 处理行的分界线和Split的分界线不同是在LineRecordReader中处理的。
 
 ***
 ###FileInputFormat
 ***
-这里重点分析getSplit()
+* Split是什么呢？如果说你有一个西瓜，几个人一起吃，那么肯定要切开才能吃。
+
+```
+public FileSplit(Path file, long start, long length, String[] hosts) {
+    this.file = file;
+    this.start = start;
+    this.length = length;
+    this.hosts = hosts;
+}
+```
+* 从Split的构造函数可以看出来，这里只是记录了一些每个Split对应的开始和范围，所有的Split还是一个文件。
+* 就像切西瓜一样，每个MapTask分到了一个Split
 
 ***
 ###TextIputFormat
@@ -42,17 +53,22 @@
   }
 ```
 * createRecordReader就是创建了一个新的LineRecordReader对象。
-* 这里
+* 这里的这种设计方式，使得实现一个自己的RecordReader非常方便。
 * isSplitable所名是否可以Split，毕竟有的是不可以分割的。
+* 这个类的主要目的就是实现这么一个通用的借口，可以非常方便的修改。
 
 ***
 ###LineReader
 ***
-readLine
+readLine方法主要是实现了从一个流中读出一行来
+* LineReader的作用就是从一个文件流中读取一行，就是方法readLine()。这里呢，不对输入做任何的假设，就是当作一个完整的文件读取出一行。
+* readLine()不对输入做任何的假设，就是当作一个完整的文件读取出一行。
+* 重点问题在于行的分界符是不同的，'\n'是Unix风格，'\r\n'是Windows风格，'\r'是MacOS风格。
 
 ***
 ###LineRecordReader
 ***
+* 通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
 initialize()
 
 ```
@@ -82,10 +98,24 @@ while (pos < end) {
 * 那么，假设有邻近的两块，第二块的开头已经被读过了，那么怎么保证不重复读取呢？第二块跳过第一个'\n'之前的内容。
 * 但是如果是第一块呢，不应该跳过，那么就不跳。结果就是initialize()中的判断是否跳过第一个'\n'之前的内容。
 * 注意，第一个'\n'之前的内容和第一行的内容，这两者的含义是不同，一行的内容应该是完整的，但是第二块中的第一行可能一部分在第一块的末尾，一部分在第二块的开头.
-* initialize()和getKeyValue()对不同Map处理的内容做了微微调整，基本上保证了每个Split由一个Map处理的语义。
+* initialize()和getKeyValue()对不同MapTask处理的内容做了微微调整，基本上保证了每个Split由一个MapTask处理的语义。
 
 ***
 #实现自己的InputFormat
 ***
-* 如果你不需要实现自己的Split，仅仅是想修改生成(K,V)的方法，那么只需要修改在createRecordReader中实现一个新的对象，并且实现这个类就可以了。比如说，每100字节作为一个(K,V)对之类的。
+* 如果你不需要实现自己的Split，仅仅是想修改生成(K,V)的方法，那么只需要修改在createRecordReader中实现一个新的RecordReader对象，并且实现这个RecordReader类就可以了。比如说，每100字节作为一个(K,V)对之类的。
 * 如果需要自定义Split的方法，可以重新实现getSplit方法和相应的对(K,V)边界和Split边界不同的处理
+
+***
+#总结
+***
+* 这里说了这么多，其实只是看了一些具体的实现，现在梳理结构
+* 对于外部的调用而言，他不需要考虑内部是如何实现将文本转换成(K,V)的，他只需要通过
+ * initialize()来实现初始化
+ * nextKeyValue()就可以判断是否还有可以使用的(K,V)
+ * getCurrentKey()获取当前的Key值
+ * getCurrentValue()获取当前的Value值
+* 至于内部是如何分片，如何读取一行是和他没有关系的
+ * 内部实现保证每个Split由一个MapTask处理的语义
+ * 内部实现保证每个K,V的语义
+* 那么这些方法具体是怎么使用的呢？请看下一部分对MapTask的介绍
