@@ -6,13 +6,18 @@
 * Partition就是为了分西瓜给ReduceTask
 * Serialize
 * 写入内存的缓冲区
+
 **以上是mainThread做的事情，获取(K,V),map,写入缓冲区一气呵成**
 **下面的就是spillTread做的事情了**
+
 * 如果mainThread发现内存缓冲区到某个临界条件了，那么就唤醒spillThread
 * spillThread把内存中的数据sortAndSpill到硬盘上,每次spill都会生成一个文件（溢写文件）。
 * 如果有设置combiner,那么先执行combine，在写入到硬盘上。
+
 **如果所有数据都已经完成处理的时候，spillThread完成了使命，就应该退出**
+
 * mainThread调用sortAndSpill()后，mergePart()会将多个溢写文件变成一个文件。
+
 ***
 ###Partition
 ***
