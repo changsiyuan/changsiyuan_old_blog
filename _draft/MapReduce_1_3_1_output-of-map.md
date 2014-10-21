@@ -3,11 +3,12 @@
 ###数据在map中的流动
 ***
 ![output-of-map](/_image/2.output-of-map.png)
-* Partition就是为了分西瓜给ReduceTask
+* Partition就是为了把输出的数据分给ReduceTask，就是再次切西瓜
 * Serialize
-* 写入内存的缓冲区
+* 把数据写入内存的缓冲区
 
-**以上是mainThread做的事情，获取(K,V),map,写入缓冲区一气呵成**
+**以上是mainThread做的事情，获取(K,V)->map->写入缓冲区一气呵成**
+
 **下面的就是spillTread做的事情了**
 
 * 如果mainThread发现内存缓冲区到某个临界条件了，那么就唤醒spillThread
@@ -28,7 +29,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 }
 ```
 * 上次说到，存入的数据是(key,value,partition)三个数据，那么partition是用来干什么的呢？
-* 前面说过Split是为了分西瓜给MapTask，那么partition就是为了分西瓜给ReduceTask，这个数字就是标示那些数据是哪个ReduceTask的
+* 前面说过Split是为了分西瓜给MapTask吃，那么partition就是为了分西瓜给ReduceTask吃，这个数字就是标示这个(K,V)属于哪个ReduceTask.
 
 ####Partitioner的实例化
 
@@ -58,10 +59,15 @@ public void write(K key, V value) throws IOException, InterruptedException {
 **spillThread调用的是sortAndSpill()**
 * 先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
 * 然后使用MergeQueue写入硬盘。
+
 ####Sort的设计
+
 ####溢写文件的结构
+
 ####combiner
+
 ####Merge
+
 * 由于Merge在Map和Reduce中均有使用，而且非常复杂，之后做单独分析。
 * 在这里就知道他是可以把多个溢写的文件合并成一个文件
  * 之前的多个文件是先按照partition来排序，partition相同的则按照key来排序的
