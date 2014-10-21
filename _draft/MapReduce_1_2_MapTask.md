@@ -38,9 +38,10 @@ public void run(Context context) throws IOException, InterruptedException {
 ```
 默认的方法就是什么都不做，输入和输出时一样的
 
-*我们已经看到了Mapper是如何运行的，那么它Mapper对象什么时候生成的呢？*
+**我们已经看到了Mapper是如何运行的，那么它Mapper对象什么时候生成的呢？**
 
-*下面请看MapTask如何一步步实例化为一个运行对象的，并且建立了相应的输入和输出环境*
+**下面请看MapTask如何一步步实例化为一个运行对象的，并且建立了相应的输入和输出环境**
+
 ***
 ##三、Mapper的实例化
 （来自org.apache.hadoop.mapred.MapTask）
