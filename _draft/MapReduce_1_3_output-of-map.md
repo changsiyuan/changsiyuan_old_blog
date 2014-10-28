@@ -7,7 +7,7 @@
 * Serialize
 * 把数据写入内存的缓冲区
 
-**以上是mainThread做的事情，获取(K,V)->map->写入缓冲区一气呵成**
+**以上是mainThread做的事情，获取(K,V)->map->写入缓冲区,在这之中又夹杂了一些小的操作比如Partition什么的**
 
 **下面的就是spillTread做的事情了**
 
@@ -62,18 +62,20 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####sort时从内存中读取数据
 
+getVbytes
+
 ####Sort的比较函数
 
 ####Writer写入硬盘
 IFile类
 
 ####溢写文件的结构
-图片来源：http://www.cnblogs.com/OnlyXP/archive/2009/05/25/1488811.html
-![spillFile](/_image/spillFile.png)
 
 ####combiner
 
-####Merge
+***
+###Merge
+***
 
 * 由于Merge在Map和Reduce中均有使用，而且非常复杂，之后做单独分析。
 * 在这里就知道他是可以把多个溢写的文件合并成一个文件
