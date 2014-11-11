@@ -53,7 +53,9 @@ set fencs=utf-8,gbk
 
 #####gedit中文支持
 
+```
 gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8','CURRENT','GB18030','ISO-8859-15','UTF-16']"
+```
 
 ###6.音乐播放器audacious
 
@@ -114,14 +116,15 @@ Type=Application
 Categories=Development;
 ```
 
-#####hadoop插件
 #####编辑器的插件(高亮插件)
 http://blog.csdn.net/ichsonx/article/details/9148497
 
-打包jar,上传到服务器,测试
 ###5.git 配置
+
 看github教程
+
 生成密钥，同步
+
 ###6.安装Racket
 编译查看src/READEME
 安装好，快捷方式share/appliction，修改图标和程序路径(变成绝对路径)
