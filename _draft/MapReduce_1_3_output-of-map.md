@@ -62,7 +62,23 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####sort时从内存中读取数据
 
-getVbytes
+关于缓冲区的设计（先不考虑partition）
+这里需要满足的两个目标是不定长的数据和排序
+对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
+就是说(startOfKey,lengthOfKey,startOfValue,lengthOfValue)
+如果排序的话，将这个作为单位来移动。
+
+MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
+但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
+Key的读取
+Value的读取
+getVBytesForOffset
+这个实现的优点就是可以不再存储KV的长度。
+缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
+kvindices第二个索引，对应于kvbuffer第二个KV。
+由此产生的后果就是不可以对索引kvindices排序。
+一旦对索引kvindices排序，那么key的值仍然是可以正确读出的，但是value的值的读取依赖于下一个索引中key的起始地址（排序之后，下一个就和写入的时候的不一样了），则不能正确读取。
+那么再建立一层索引kvoffsets，来进行排序。
 
 ####Sort的比较函数
 
