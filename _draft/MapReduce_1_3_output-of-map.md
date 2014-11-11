@@ -53,6 +53,78 @@ public void write(K key, V value) throws IOException, InterruptedException {
 ***
 ###内存缓冲区
 ***
+####整体看MapOutputBuffer
+
+![overview](/_image/3.0.MapOutputBuffer.png)
+
+这是一个两级索引(kvoffsets和kvindices)的环形缓冲区。
+这个是看缓冲区不同层次之间的关系，那么每层又是如何使用的呢？
+
+####如何使用kvoffsets
+
+![kvoffsets](/_image/3.1.kvoffsets.png)
+
+分成了几个部分，空闲、正在Spill、将要Spill。
+这样同一个缓冲区，可以安全的由多个线程来同时操作。
+当然kvoffsets中仅仅是写入了索引，实际的内容是在kvbuffer中的。
+
+####正常写入kvbuffer的四个步骤
+
+![kvbuffer1](/_image/3.2.kvbuffer1.png)
+![kvbuffer2](/_image/3.3.kvbuffer2.png)
+
+####异常写入kvbuffer
+
+![kvbuffer3](/_image/3.4.kvbuffer3.png)
+
+####为什么要有两级索引
+
+关于缓冲区的设计（先不考虑）
+这里需要满足的两个目标是不定长的数据和排序
+对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
+就是说(startOfPartition,lengthOfPartition,startOfKey,lengthOfKey,startOfValue,lengthOfValue)
+如果排序的话，将这个作为单位来移动。
+
+MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
+但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
+
+#####Key的读取
+
+```
+      public DataInputBuffer getKey() throws IOException {
+        final int kvoff = kvoffsets[current % kvoffsets.length];
+        keybuf.reset(kvbuffer, kvindices[kvoff + KEYSTART],
+                     kvindices[kvoff + VALSTART] - kvindices[kvoff + KEYSTART]);
+        return keybuf;
+      }
+```
+
+#####Value的读取
+
+```
+      public DataInputBuffer getValue() throws IOException {
+        getVBytesForOffset(kvoffsets[current % kvoffsets.length], vbytes);
+        return vbytes;
+      }
+    private void getVBytesForOffset(int kvoff, InMemValBytes vbytes) {
+      final int nextindex = (kvoff / ACCTSIZE ==
+                            (kvend - 1 + kvoffsets.length) % kvoffsets.length)
+        ? bufend
+        : kvindices[(kvoff + ACCTSIZE + KEYSTART) % kvindices.length];
+      int vallen = (nextindex >= kvindices[kvoff + VALSTART])
+        ? nextindex - kvindices[kvoff + VALSTART]
+        : (bufvoid - kvindices[kvoff + VALSTART]) + nextindex;
+      vbytes.reset(kvbuffer, kvindices[kvoff + VALSTART], vallen);
+    }
+```
+
+这个实现的优点就是可以不再存储KV的长度。
+缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
+kvindices第二个索引，对应于kvbuffer第二个KV。
+由此产生的后果就是不可以对索引kvindices排序。
+一旦对索引kvindices排序，那么key的值仍然是可以正确读出的，但是value的值的读取依赖于下一个索引中key的起始地址（排序之后，下一个就和写入的时候的不一样了），则不能正确读取。
+那么再建立一层索引kvoffsets，来进行排序。
+
 ***
 ###Spill
 ***
@@ -62,30 +134,15 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####sort时从内存中读取数据
 
-关于缓冲区的设计（先不考虑partition）
-这里需要满足的两个目标是不定长的数据和排序
-对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
-就是说(startOfKey,lengthOfKey,startOfValue,lengthOfValue)
-如果排序的话，将这个作为单位来移动。
-
-MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
-但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
-Key的读取
-Value的读取
-getVBytesForOffset
-这个实现的优点就是可以不再存储KV的长度。
-缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
-kvindices第二个索引，对应于kvbuffer第二个KV。
-由此产生的后果就是不可以对索引kvindices排序。
-一旦对索引kvindices排序，那么key的值仍然是可以正确读出的，但是value的值的读取依赖于下一个索引中key的起始地址（排序之后，下一个就和写入的时候的不一样了），则不能正确读取。
-那么再建立一层索引kvoffsets，来进行排序。
-
 ####Sort的比较函数
 
 ####Writer写入硬盘
+
 IFile类
 
 ####溢写文件的结构
+
+!(spillfile)[/_image/3.5.spill.png]
 
 ####combiner
 
