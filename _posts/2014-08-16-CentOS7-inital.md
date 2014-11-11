@@ -1,3 +1,12 @@
+---
+layout : post
+title : CentOS 7 日常使用配置
+category : other
+tagline : "Supporting tagline"
+tags : [CentOS]
+---
+{% include JB/setup %}
+
 
 ***
 ##日常使用
