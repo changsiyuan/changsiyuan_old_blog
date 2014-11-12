@@ -22,7 +22,7 @@
 ***
 ###Partition
 ***
-```
+```java
 public void write(K key, V value) throws IOException, InterruptedException {
     collector.collect(key, value,
                       partitioner.getPartition(key, value, partitions));
@@ -33,7 +33,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####Partitioner的实例化
 
-```
+```java
 来自org.apache.hadoop.mapred.NewOutputCollector部分代码
  partitioner = (org.apache.hadoop.mapreduce.Partitioner<K,V>)
            ReflectionUtils.newInstance(jobContext.getPartitionerClass(), job);
@@ -57,6 +57,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ![overview](/_image/3.0.MapOutputBuffer.png)
 
+环形:kvnetx=(kvindex+1)%kvoffsets.length
 这是一个两级索引(kvoffsets和kvindices)的环形缓冲区。
 这个是看缓冲区不同层次之间的关系，那么每层又是如何使用的呢？
 
@@ -68,12 +69,16 @@ public void write(K key, V value) throws IOException, InterruptedException {
 这样同一个缓冲区，可以安全的由多个线程来同时操作。
 当然kvoffsets中仅仅是写入了索引，实际的内容是在kvbuffer中的。
 
-####正常写入kvbuffer的四个步骤
+####写入kvbuffer的一般过程（四个步骤）
 
 ![kvbuffer1](/_image/3.2.kvbuffer1.png)
 ![kvbuffer2](/_image/3.3.kvbuffer2.png)
 
-####异常写入kvbuffer
+####写入kvbuffer的异常情况
+
+排序时要求key是连续存放的，所以在写入Key之后，要检测是否连续，不连续就要进行相应的操作来保证连续。
+
+reset()就是用来保证key是连续的。 
 
 ![kvbuffer3](/_image/3.4.kvbuffer3.png)
 
@@ -98,6 +103,9 @@ MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
         return keybuf;
       }
 ```
+* KV是连续存放在一起的。
+* K本身的连续性在写入的时候已经保证
+* 那么V的起始地址和K的起始地址之间就是key的值。
 
 #####Value的读取
 
@@ -117,10 +125,17 @@ MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
       vbytes.reset(kvbuffer, kvindices[kvoff + VALSTART], vallen);
     }
 ```
+* KV是连续存放在一起的，那么就是KVKVKVKV这个样子的
+* 就是说V的起始地址和下一个K的起始地址之间的数据就是V的值
+* 但是缓冲区是环形的，所以V可能不是连续存放的
+* InMemValBytes 这个类就是为了解决不连续这个问题存在的。
 
+####分析
 这个实现的优点就是可以不再存储KV的长度。
 
-缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
+缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，
+
+也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
 
 kvindices第二个索引，对应于kvbuffer第二个KV。
 
@@ -137,9 +152,50 @@ kvindices第二个索引，对应于kvbuffer第二个KV。
 * sort就是先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
 * 然后使用Writer写入硬盘。
 
-####sort时从内存中读取数据
+####Sort时从内存中读取数据
 
-####Sort的比较函数
+```
+  final int kvoff = kvoffsets[spindex % kvoffsets.length];
+  getVBytesForOffset(kvoff, value);
+  key.reset(kvbuffer, kvindices[kvoff + KEYSTART],
+             (kvindices[kvoff + VALSTART] - 
+                kvindices[kvoff + KEYSTART]));
+```
+
+####Sort
+
+```java
+排序使用的是QuickSort
+      sorter = ReflectionUtils.newInstance(
+                  job.getClass("map.sort.class", QuickSort.class, IndexedSorter.class), job);
+比较函数
+    public int compare(int i, int j) {
+      final int ii = kvoffsets[i % kvoffsets.length];
+      final int ij = kvoffsets[j % kvoffsets.length];
+      // sort by partition
+      if (kvindices[ii + PARTITION] != kvindices[ij + PARTITION]) {
+        return kvindices[ii + PARTITION] - kvindices[ij + PARTITION];
+      }
+      // sort by key
+      return comparator.compare(kvbuffer,
+          kvindices[ii + KEYSTART],
+          kvindices[ii + VALSTART] - kvindices[ii + KEYSTART],
+          kvbuffer,
+          kvindices[ij + KEYSTART],
+          kvindices[ij + VALSTART] - kvindices[ij + KEYSTART]);
+    }
+交换函数
+    public void swap(int i, int j) {
+      i %= kvoffsets.length;
+      j %= kvoffsets.length;
+      int tmp = kvoffsets[i];
+      kvoffsets[i] = kvoffsets[j];
+      kvoffsets[j] = tmp;
+    }
+```
+就一个排序过程来讲，起始就是需要两个操作，比较大小，和交换位置。
+
+这里排序的设计是相当精彩的。
 
 ####Writer写入硬盘
 
@@ -150,6 +206,42 @@ IFile类
 ![spillfile](/_image/3.5.spill.png)
 
 ####combiner
+```java
+            if (combinerRunner == null) {
+              // spill directly
+              DataInputBuffer key = new DataInputBuffer();
+              while (spindex < endPosition &&
+                  kvindices[kvoffsets[spindex % kvoffsets.length]
+                            + PARTITION] == i) {
+                final int kvoff = kvoffsets[spindex % kvoffsets.length];
+                getVBytesForOffset(kvoff, value);
+                key.reset(kvbuffer, kvindices[kvoff + KEYSTART],
+                          (kvindices[kvoff + VALSTART] - 
+                           kvindices[kvoff + KEYSTART]));
+                writer.append(key, value);
+                ++spindex;
+              }
+            } else {
+              int spstart = spindex;
+              while (spindex < endPosition &&
+                  kvindices[kvoffsets[spindex % kvoffsets.length]
+                            + PARTITION] == i) {
+                ++spindex;
+              }
+              // Note: we would like to avoid the combiner if we've fewer
+              // than some threshold of records for a partition
+              if (spstart != spindex) {
+                combineCollector.setWriter(writer);
+                RawKeyValueIterator kvIter =
+                  new MRResultIterator(spstart, spindex);
+                combinerRunner.combine(kvIter, combineCollector);
+              }
+            }
+```
+
+* MRResultIterator类将缓冲区的读取变成了KV对的读取
+* combiner的处理就是在spill写入硬盘之前。
+* combiner就可以从缓冲区中把内容读取出来，进行处理，写入文件。
 
 ***
 ###Merge
