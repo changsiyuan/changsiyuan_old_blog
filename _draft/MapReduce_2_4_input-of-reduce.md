@@ -1,1 +1,2 @@
-copy phase
+何时由(K,V)变成了(K,list<V>)
+数据来自硬盘和内存
