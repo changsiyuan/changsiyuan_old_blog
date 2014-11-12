@@ -57,17 +57,17 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ![overview](/_image/3.0.MapOutputBuffer.png)
 
-环形:kvnetx=(kvindex+1)%kvoffsets.length
-这是一个两级索引(kvoffsets和kvindices)的环形缓冲区。
-这个是看缓冲区不同层次之间的关系，那么每层又是如何使用的呢？
+* 环形:kvnetx=(kvindex+1)%kvoffsets.length
+* 这是一个两级索引(kvoffsets和kvindices)的环形缓冲区。
+* 这个是看缓冲区不同层次之间的关系，那么每层又是如何使用的呢？
 
 ####如何使用kvoffsets
 
 ![kvoffsets](/_image/3.1.kvoffsets.png)
 
-分成了几个部分，空闲、正在Spill、将要Spill。
-这样同一个缓冲区，可以安全的由多个线程来同时操作。
-当然kvoffsets中仅仅是写入了索引，实际的内容是在kvbuffer中的。
+* 分成了几个部分，空闲、正在Spill、将要Spill。
+* 这样同一个缓冲区，可以安全的由多个线程来同时操作。
+* 当然kvoffsets中仅仅是写入了索引，实际的内容是在kvbuffer中的。
 
 ####写入kvbuffer的一般过程（四个步骤）
 
@@ -76,22 +76,20 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####写入kvbuffer的异常情况
 
-排序时要求key是连续存放的，所以在写入Key之后，要检测是否连续，不连续就要进行相应的操作来保证连续。
+* 排序时要求key是连续存放的，所以在写入Key之后，要检测是否连续，不连续就要进行相应的操作来保证连续。
 
-reset()就是用来保证key是连续的。 
+* reset()就是用来保证key是连续的。 
 
 ![kvbuffer3](/_image/3.4.kvbuffer3.png)
 
-####为什么要有两级索引
+###关于缓冲区的设计
+* 这里需要满足的两个目标是不定长的数据和排序
+* 对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
+* 就是说(startOfPartition,lengthOfPartition,startOfKey,lengthOfKey,startOfValue,lengthOfValue)
+* 如果排序的话，将这个作为单位来移动。
 
-关于缓冲区的设计（先不考虑）
-这里需要满足的两个目标是不定长的数据和排序
-对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
-就是说(startOfPartition,lengthOfPartition,startOfKey,lengthOfKey,startOfValue,lengthOfValue)
-如果排序的话，将这个作为单位来移动。
-
-MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
-但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
+* MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
+* 但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
 
 #####Key的读取
 
