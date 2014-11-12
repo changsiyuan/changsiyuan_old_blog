@@ -77,7 +77,6 @@ public void write(K key, V value) throws IOException, InterruptedException {
 ####写入kvbuffer的异常情况
 
 * 排序时要求key是连续存放的，所以在写入Key之后，要检测是否连续，不连续就要进行相应的操作来保证连续。
-
 * reset()就是用来保证key是连续的。 
 
 ![kvbuffer3](/_image/3.4.kvbuffer3.png)
@@ -87,7 +86,6 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
 * 就是说(startOfPartition,lengthOfPartition,startOfKey,lengthOfKey,startOfValue,lengthOfValue)
 * 如果排序的话，将这个作为单位来移动。
-
 * MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
 * 但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
 
@@ -129,19 +127,13 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * InMemValBytes 这个类就是为了解决不连续这个问题存在的。
 
 ####分析
-这个实现的优点就是可以不再存储KV的长度。
-
-缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，
-
-也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
-
-kvindices第二个索引，对应于kvbuffer第二个KV。
-
-由此产生的后果就是不可以对索引kvindices排序。
-
-一旦对索引kvindices排序，那么key的值仍然是可以正确读出的，但是value的值的读取依赖于下一个索引中key的起始地址（排序之后，下一个就和写入的时候的不一样了），则不能正确读取。
-
-那么再建立一层索引kvoffsets，来进行排序。
+* 这个实现的优点就是可以不再存储KV的长度。
+* 缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，
+* 也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
+* kvindices第二个索引，对应于kvbuffer第二个KV。
+* 由此产生的后果就是不可以对索引kvindices排序。
+* 一旦对索引kvindices排序，那么key的值仍然是可以正确读出的，但是value的值的读取依赖于下一个索引中key的起始地址（排序之后，下一个就和写入的时候的不一样了），则不能正确读取。
+* 那么再建立一层索引kvoffsets，来进行排序。
 
 ***
 ###Spill
