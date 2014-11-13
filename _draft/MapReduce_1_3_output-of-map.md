@@ -183,9 +183,9 @@ public void write(K key, V value) throws IOException, InterruptedException {
       kvoffsets[j] = tmp;
     }
 ```
-就一个排序过程来讲，起始就是需要两个操作，比较大小，和交换位置。
 
-这里排序的设计是相当精彩的。
+* 就一个排序过程来讲，起始就是需要两个操作，比较大小，和交换位置。
+* 这里排序的设计是相当精彩的。
 
 ####Writer写入硬盘
 
