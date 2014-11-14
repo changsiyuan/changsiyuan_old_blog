@@ -180,7 +180,7 @@ IndexRecord中的结构
   long partLength;
 ```
 * Spill的过程，是相同Partition的数据一起写入
-* 数据文件中，相同Partition的文件是连续存放的，制订每一部分的长度就可以了。
+* 数据文件中，相同Partition的文件是连续存放的，指定每一部分的长度就可以了。
 * 就是说每个Partition有一个IndexRecord记录就可以
 
 #####每条记录的结构
