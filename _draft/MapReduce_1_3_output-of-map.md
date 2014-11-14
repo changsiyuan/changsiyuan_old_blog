@@ -54,19 +54,13 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####获取序列化的方法
 
-```
-    private final BlockingBuffer bb = new BlockingBuffer();
-    keySerializer = serializationFactory.getSerializer(keyClass);
-    keySerializer.open(bb);
-    valSerializer = serializationFactory.getSerializer(valClass);
-    valSerializer.open(bb);
-
-```
-#####第一部分:获得构造序列化的对象
+#####第一部分:获得构造序列化对象的构造函数
 
 * 默认的是org.apache.hadoop.io.serializer.WritableSerialization
 
 ```java
+      serializationFactory = new SerializationFactory(job);
+    其中SerializationFactory的实现
     public SerializationFactory(Configuration conf) {
         super(conf);
         for (String serializerName : conf.getStrings("io.serializations", 
@@ -74,12 +68,20 @@ public void write(K key, V value) throws IOException, InterruptedException {
                 add(conf, serializerName);
             }
         }
+```
+
+#####第二部分：获得执行序列化的对象
+
+```java
+    keySerializer = serializationFactory.getSerializer(keyClass);
+    valSerializer = serializationFactory.getSerializer(valClass);
+
     默认Serialization中返回的WritableSerializer
     public Serializer<Writable> getSerializer(Class<Writable> c) {
         return new WritableSerializer();
     }
 ```
-#####第二部分:序列化的方法
+#####第三部分:序列化的方法
 
 ```java
 WritableSerializer中open方法的实现
@@ -173,7 +175,7 @@ WritableSerializer中open方法的实现
 ####溢写文件的结构
 ![spillfile](/_image/3.5.spill.png)
 
-```
+```java
 IndexRecord中的结构，其实就是和图一样的
   long startOffset;
   long rawLength;
