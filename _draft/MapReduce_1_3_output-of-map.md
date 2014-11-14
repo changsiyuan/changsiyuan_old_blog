@@ -51,6 +51,53 @@ public void write(K key, V value) throws IOException, InterruptedException {
 ***
 ###Serialize
 ***
+
+####获取序列化的方法
+
+```
+    private final BlockingBuffer bb = new BlockingBuffer();
+    keySerializer = serializationFactory.getSerializer(keyClass);
+    keySerializer.open(bb);
+    valSerializer = serializationFactory.getSerializer(valClass);
+    valSerializer.open(bb);
+
+```
+#####第一部分:获得构造序列化的对象
+
+* 默认的是org.apache.hadoop.io.serializer.WritableSerialization
+
+```java
+    public SerializationFactory(Configuration conf) {
+        super(conf);
+        for (String serializerName : conf.getStrings("io.serializations", 
+            new String[]{"org.apache.hadoop.io.serializer.WritableSerialization"})) {
+                add(conf, serializerName);
+            }
+        }
+    默认Serialization中返回的WritableSerializer
+    public Serializer<Writable> getSerializer(Class<Writable> c) {
+        return new WritableSerializer();
+    }
+```
+#####第二部分:序列化的方法
+
+```java
+WritableSerializer中open方法的实现
+
+    public void open(OutputStream out) {
+        if (out instanceof DataOutputStream) {
+           dataOut = (DataOutputStream) out;
+        } else {
+           dataOut = new DataOutputStream(out);
+        }
+   }
+    public void serialize(Writable w) throws IOException {
+        w.write(dataOut);
+    }
+```
+* open方法实现了指定输出位置
+* serialize方法是把对象写入指定的输出位置
+
 ***
 ###整体看MapOutputBuffer存储
 ***
@@ -121,13 +168,13 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 ####Writer写入硬盘
 
-IFile类
+* 使用IFile类将数据写入硬盘
 
 ####溢写文件的结构
 ![spillfile](/_image/3.5.spill.png)
 
 ```
-IndexRecord中的结构，起始就是和图一样的
+IndexRecord中的结构，其实就是和图一样的
   long startOffset;
   long rawLength;
   long partLength;
@@ -138,31 +185,8 @@ IndexRecord中的结构，起始就是和图一样的
 ```java
             if (combinerRunner == null) {
               // spill directly
-              DataInputBuffer key = new DataInputBuffer();
-              while (spindex < endPosition &&
-                  kvindices[kvoffsets[spindex % kvoffsets.length]
-                            + PARTITION] == i) {
-                final int kvoff = kvoffsets[spindex % kvoffsets.length];
-                getVBytesForOffset(kvoff, value);
-                key.reset(kvbuffer, kvindices[kvoff + KEYSTART],
-                          (kvindices[kvoff + VALSTART] - 
-                           kvindices[kvoff + KEYSTART]));
-                writer.append(key, value);
-                ++spindex;
               }
             } else {
-              int spstart = spindex;
-              while (spindex < endPosition &&
-                  kvindices[kvoffsets[spindex % kvoffsets.length]
-                            + PARTITION] == i) {
-                ++spindex;
-              }
-              // Note: we would like to avoid the combiner if we've fewer
-              // than some threshold of records for a partition
-              if (spstart != spindex) {
-                combineCollector.setWriter(writer);
-                RawKeyValueIterator kvIter =
-                  new MRResultIterator(spstart, spindex);
                 combinerRunner.combine(kvIter, combineCollector);
               }
             }
@@ -176,8 +200,9 @@ IndexRecord中的结构，起始就是和图一样的
 ###Merge
 ***
 
-* 由于Merge在Map和Reduce中均有使用，而且非常复杂，之后做单独分析。
-* 在这里就知道他是可以把多个溢写的文件合并成一个文件
+* Spill过程会执行多次，生成多个溢写文件
+* merge过程就是将这么多的溢写的文件合并成一个文件,并且保持以下性质
  * 之前的多个文件是先按照partition来排序，partition相同的则按照key来排序的
  * 新的文件是也是先按照partition来排序，partition相同的则按照key来排序的一个文件
  * 也就是说merge包含由排序和合并文件两个功能。
+* 由于Merge在Map和Reduce中均有使用，而且非常复杂，之后做单独分析。
