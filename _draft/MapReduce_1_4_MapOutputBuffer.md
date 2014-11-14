@@ -102,7 +102,7 @@
 ####写入缓冲区数据
 * 上面仅仅是解释了如何写入，但是代码中实际上是怎么写的呢？
 
-collect
+#####collect中对象的初始化
 
 ```
     private final BlockingBuffer bb = new BlockingBuffer();
@@ -112,7 +112,7 @@ collect
     valSerializer.open(bb);
 
 ```
-#####先看第一部分，获得序列化的方法
+#####第一部分:获得序列化的对象
 
 * 默认的是org.apache.hadoop.io.serializer.WritableSerialization
 
@@ -124,14 +124,16 @@ collect
                 add(conf, serializerName);
             }
         }
-    这个Serialization中返回的WritableSerializer
+    默认Serialization中返回的WritableSerializer
     public Serializer<Writable> getSerializer(Class<Writable> c) {
         return new WritableSerializer();
     }
 ```
-#####第二部分open方法
+#####第二部分:open方法
 
 ```java
+WritableSerializer中open方法的实现
+
     public void open(OutputStream out) {
         if (out instanceof DataOutputStream) {
            dataOut = (DataOutputStream) out;
@@ -139,8 +141,11 @@ collect
            dataOut = new DataOutputStream(out);
         }
    }
+
+调用该函数时的参数是：
+private final BlockingBuffer bb = new BlockingBuffer();
 ```
-#####写入过程
+#####collect写入过程
 ```
     keySerializer.serialize(key);
     valSerializer.serialize(value);
@@ -149,8 +154,7 @@ collect
 * 看这个可能感觉比较奇怪，为什么这样就直接写入了缓冲区呢？
 
 ```java
-WritableSerializer中serialize的实现方法
-
+WritableSerializer中serialize实现
     public void serialize(Writable w) throws IOException {
         w.write(dataOut);
     }
@@ -163,4 +167,4 @@ WritableSerializer中serialize的实现方法
 
 * 从缓冲区读取出有两种方法
  * 一种方法是sortAndSpill方法中使用的直接从内部的数组读取（spillThread是写在MapOutputBuffer的一个内部类）
- * 还有一种方法是有combiner使用，MRResultIterator将缓冲区内的数据组织成KV对的读取。
+ * 还有一种方法是MRResultIterator，这个类将缓冲区内的数据封装成KV对的读取由combiner使用的。

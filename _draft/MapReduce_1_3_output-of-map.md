@@ -119,14 +119,20 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * 从compare中看出来，先根据partition的大小来排序，再根据key来排序。
 * 排序实际上仅仅是改变了kvoffsets中的数据，其他的没有任何的改变。
 
-####边排序边写入硬盘
 ####Writer写入硬盘
 
 IFile类
 
 ####溢写文件的结构
-
 ![spillfile](/_image/3.5.spill.png)
+
+```
+IndexRecord中的结构，起始就是和图一样的
+  long startOffset;
+  long rawLength;
+  long partLength;
+```
+
 
 ####combiner
 ```java
