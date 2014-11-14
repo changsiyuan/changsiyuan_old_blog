@@ -51,9 +51,6 @@ public void write(K key, V value) throws IOException, InterruptedException {
 ***
 ###Serialize
 ***
-
-####获取序列化的方法
-
 #####第一部分:获得构造序列化对象的构造函数
 
 * 默认的是org.apache.hadoop.io.serializer.WritableSerialization
@@ -172,16 +169,28 @@ WritableSerializer中open方法的实现
 
 * 使用IFile类将数据写入硬盘
 
-####溢写文件的结构
+#####溢写文件的结构
 ![spillfile](/_image/3.5.spill.png)
 
+#####索引文件和IndexRecord
 ```java
-IndexRecord中的结构，其实就是和图一样的
+IndexRecord中的结构
   long startOffset;
   long rawLength;
   long partLength;
 ```
+* Spill的过程，是相同Partition的数据一起写入
+* 数据文件中，相同Partition的文件是连续存放的，制订每一部分的长度就可以了。
+* 就是说每个Partition有一个IndexRecord记录就可以
 
+#####每条记录的结构
+```
+IFile中Writer的append方法：
+
+   WritableUtils.writeVInt(out, keyLength);                  // key length
+   WritableUtils.writeVInt(out, valueLength);                // value length
+   out.write(buffer.getData(), 0, buffer.getLength());       // data
+```
 
 ####combiner
 ```java
