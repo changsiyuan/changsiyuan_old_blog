@@ -3,11 +3,11 @@
 ###数据在map中的流动
 ***
 ![output-of-map](/_image/2.output-of-map.png)
-* Partition就是为了把输出的数据分给ReduceTask，就是再次切西瓜
+* Partition就是实现给数据贴标签功能，标记该数据应该由哪个reduce去处理。
 * Serialize
 * 把数据写入内存的缓冲区
 
-**以上是mainThread做的事情，获取(K,V)->map->写入缓冲区,在这之中又夹杂了一些小的操作比如Partition什么的**
+**以上是mainThread中write方法所做的几件事情，获取(K,V)->map->写入缓冲区,在这之中又夹杂了一些小的操作比如Partition什么的**
 
 **下面的就是spillTread做的事情了**
 
@@ -29,7 +29,8 @@ public void write(K key, V value) throws IOException, InterruptedException {
 }
 ```
 * 上次说到，存入的数据是(key,value,partition)三个数据，那么partition是用来干什么的呢？
-* 前面说过Split是为了分西瓜给MapTask吃，那么partition就是为了分西瓜给ReduceTask吃，这个数字就是标示这个(K,V)属于哪个ReduceTask.
+* 前面说过Split是为了分西瓜给MapTask吃，输出的数据应该分给不同的reduce去处理，那么怎么标示这个数据分给哪个reduce呢？
+* Partition就是实现给数据贴标签功能，就是再次切西瓜把西瓜分好,具体的实现就是使用数字来标记。
 
 ####Partitioner的实例化
 
@@ -51,90 +52,19 @@ public void write(K key, V value) throws IOException, InterruptedException {
 ###Serialize
 ***
 ***
-###内存缓冲区
+###整体看MapOutputBuffer存储
 ***
-####整体看MapOutputBuffer
-
 ![overview](/_image/3.0.MapOutputBuffer.png)
 
+* 这是一个两级索引(kvoffsets和kvindices)的环形缓冲区(数据在kvbuffer中)。
+* kvoffsets、kvindices、kvbuffer就是三个大数组，其中kvbuffer非常大。
 * 环形:kvnetx=(kvindex+1)%kvoffsets.length
-* 这是一个两级索引(kvoffsets和kvindices)的环形缓冲区。
-* 这个是看缓冲区不同层次之间的关系，那么每层又是如何使用的呢？
-
-####如何使用kvoffsets
-
-![kvoffsets](/_image/3.1.kvoffsets.png)
-
-* 分成了几个部分，空闲、正在Spill、将要Spill。
-* 这样同一个缓冲区，可以安全的由多个线程来同时操作。
-* 当然kvoffsets中仅仅是写入了索引，实际的内容是在kvbuffer中的。
-
-####写入kvbuffer的一般过程（四个步骤）
-
-![kvbuffer1](/_image/3.2.kvbuffer1.png)
-![kvbuffer2](/_image/3.3.kvbuffer2.png)
-
-####写入kvbuffer的异常情况
-
-* 排序时要求key是连续存放的，所以在写入Key之后，要检测是否连续，不连续就要进行相应的操作来保证连续。
-* reset()就是用来保证key是连续的。 
-
-![kvbuffer3](/_image/3.4.kvbuffer3.png)
-
-###关于缓冲区的设计
-* 这里需要满足的两个目标是不定长的数据和排序
-* 对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
-* 就是说(startOfPartition,lengthOfPartition,startOfKey,lengthOfKey,startOfValue,lengthOfValue)
-* 如果排序的话，将这个作为单位来移动。
-* MapOutputBuffer实现的索引是kvindices，具体的值存储在kvbuffer中。
-* 但是kvindices没有长度，只有起始位置，那么如何读取数据呢？
-
-#####Key的读取
-
-```java
-      public DataInputBuffer getKey() throws IOException {
-        final int kvoff = kvoffsets[current % kvoffsets.length];
-        keybuf.reset(kvbuffer, kvindices[kvoff + KEYSTART],
-                     kvindices[kvoff + VALSTART] - kvindices[kvoff + KEYSTART]);
-        return keybuf;
-      }
-```
-* KV是连续存放在一起的。
-* K本身的连续性在写入的时候已经保证
-* 那么V的起始地址和K的起始地址之间就是key的值。
-
-#####Value的读取
-
-```java
-    public DataInputBuffer getValue() throws IOException {
-      getVBytesForOffset(kvoffsets[current % kvoffsets.length], vbytes);
-      return vbytes;
-    }
-    private void getVBytesForOffset(int kvoff, InMemValBytes vbytes) {
-      final int nextindex = (kvoff / ACCTSIZE ==
-                            (kvend - 1 + kvoffsets.length) % kvoffsets.length)
-        ? bufend
-        : kvindices[(kvoff + ACCTSIZE + KEYSTART) % kvindices.length];
-      int vallen = (nextindex >= kvindices[kvoff + VALSTART])
-        ? nextindex - kvindices[kvoff + VALSTART]
-        : (bufvoid - kvindices[kvoff + VALSTART]) + nextindex;
-      vbytes.reset(kvbuffer, kvindices[kvoff + VALSTART], vallen);
-    }
-```
-* KV是连续存放在一起的，那么就是KVKVKVKV这个样子的
-* 就是说V的起始地址和下一个K的起始地址之间的数据就是V的值
-* 但是缓冲区是环形的，所以V可能不是连续存放的
-* InMemValBytes 这个类就是为了解决不连续这个问题存在的。
-
-####分析
-* 这个实现的优点就是可以不再存储KV的长度。
-* 缺点呢，不是很明显。这种方法暗含着一个假设，就是索引的位置顺序和存储数据的位置顺序是一致的，
-* 也就是说kvindices第一个索引，对应于kvbuffer第一个KV，
-* kvindices第二个索引，对应于kvbuffer第二个KV。
-* 由此产生的后果就是不可以对索引kvindices排序。
-* 一旦对索引kvindices排序，那么key的值仍然是可以正确读出的，但是value的值的读取依赖于下一个索引中key的起始地址（排序之后，下一个就和写入的时候的不一样了），则不能正确读取。
-* 那么再建立一层索引kvoffsets，来进行排序。
-
+* 该部分的管理特别复杂，之后由专门的分析
+* 写入缓冲区就是上篇文章最后讲到的collect方法。
+* 从缓冲区读取出有两种方法
+ * 一种方法是sortAndSpill方法中使用的直接从内部的数组读取（spillThread是写在MapOutputBuffer的一个内部类）
+ * 还有一种方法是有combiner使用，MRResultIterator将缓冲区内的数据组织成KV对的读取。
+ 
 ***
 ###Spill
 ***
@@ -142,17 +72,17 @@ public void write(K key, V value) throws IOException, InterruptedException {
 * sort就是先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
 * 然后使用Writer写入硬盘。
 
-####Sort时从内存中读取数据
+####Sort时从内存缓冲区中读取数据(可以先跳过)
 
-```
+```java
+
   final int kvoff = kvoffsets[spindex % kvoffsets.length];
   getVBytesForOffset(kvoff, value);
   key.reset(kvbuffer, kvindices[kvoff + KEYSTART],
              (kvindices[kvoff + VALSTART] - 
                 kvindices[kvoff + KEYSTART]));
 ```
-
-####Sort
+####使用快排对数据进行排序
 
 ```java
 排序使用的是QuickSort
@@ -186,7 +116,10 @@ public void write(K key, V value) throws IOException, InterruptedException {
 
 * 就一个排序过程来讲，起始就是需要两个操作，比较大小，和交换位置。
 * 这里排序的设计是相当精彩的。
+* 从compare中看出来，先根据partition的大小来排序，再根据key来排序。
+* 排序实际上仅仅是改变了kvoffsets中的数据，其他的没有任何的改变。
 
+####边排序边写入硬盘
 ####Writer写入硬盘
 
 IFile类
