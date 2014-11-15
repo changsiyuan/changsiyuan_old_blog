@@ -51,12 +51,16 @@ MapReduce分为以下几个阶段（TaskStatus）
 ##3.本系列的顺序
 ***
 
-####map
+* MapReduce框架整体上分成MapTask和ReduceTask两个部分
+
+####MapTask
+* MapTask是执行map相关操作的实体，map是对数据进行处理编程接口，除了map其他的均在MapTask中实现
 * map的输入TextInputFormat
 * map的数据处理流程Mapper、MapTask
 * map的输出MapOutputBuffer
 
-####reduce
+####ReduceTask
+* ReduceTask是执行reduce相关操作的实体，reduce是对数据进行处理的编程接口，而数据的输入输出等均在ReduceTask中实现
 * reduce的输入
 * reduce的数据处理流程Reducer、ReduceTask
 * reduce的输出TextOutputFormat
