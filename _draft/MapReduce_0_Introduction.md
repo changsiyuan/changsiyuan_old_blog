@@ -27,7 +27,7 @@ MapReduce分为以下几个阶段（TaskStatus）
 
 ####WordCount为例，处理的流程
 
-一般来讲，MapReduce的框架在处理数据的时候是这样的。以WordCount为例，一个文本变成了多个(K1,V1)，然后自己可以在map中处理这个键值对，生成一个新的键值对(K2,V2)，在reduce中又可以处理一个新的键值对(K2，list&ltV2>)，处理的结果会变成文本输出。
+一般来讲，MapReduce的框架在处理数据的时候是这样的。以WordCount为例，一个文本变成了多个(K1,V1)，然后自己可以在map中处理这个键值对，生成一个新的键值对(K2,V2)，在reduce中又可以处理一个新的键值对(K2，list&lt;V2>)，处理的结果会变成文本输出。
 
 应该说MapReduce框架隐藏了大量的实现细节，本系列采取问题驱动，每篇文章解决一个问题，下面的一些问题会在后面得到完整的解答。
 
@@ -41,8 +41,8 @@ MapReduce分为以下几个阶段（TaskStatus）
 ####shuffle流程中的问题
 
 1. map的输出是如何管理的，reduce的输入又是从何而来，两者之间有什么关系？
-2. map输出是(K,V)，那么为什么reduce的输入是(K,list<V>)？
-3. 相同的K可能会分配在不同的机器上，为什么reduce能够得到所有的数据，而且还是(K.list<V>)形式的
+2. map输出是(K,V)，那么为什么reduce的输入是(K,list&lt;V>)？
+3. 相同的K可能会分配在不同的机器上，为什么reduce能够得到所有的数据，而且还是(K,list&lt;V>)形式的
 4. 为什么要排序，如何实现的排序？
 5. 什么是merge，为什么要merge,merge和spill有什么关系？
 6. map reduce combine有什么关系？
@@ -72,4 +72,5 @@ MapReduce分为以下几个阶段（TaskStatus）
 * sort 函数、sort的效果、sort phase
 * sort、spill、merge的关系
 * map reduce combine
-* MapReduce框架回顾
+* MapReduce v1框架回顾
+* MapReduce On Yarn介绍
