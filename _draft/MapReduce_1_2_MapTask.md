@@ -77,7 +77,7 @@ MapTask mapper map直接的关系
 * 答案就是这里，Mapper在运行的时候不断的获得键值对，不断的交给map去处理。
 
 ***
-###四、输入的实例化
+###输入的实例化
 ***
 #####InputFormat和RecordReader的区别
 * InputFormat和RecordReader的分别初始化，感觉有点奇怪
@@ -154,10 +154,10 @@ collector = new MapOutputBuffer<K,V>(umbilical, job, reporter);
 
 * 这里可以知道了最终是使用的MapOutputBuffer中的collect()，直接写入了缓存中
 * 收集的数据就是(key,value,partition)三个数据作为一个逻辑单元。至于为什么要加入partition,之后再解释。
-* 现在整体的架构已经清楚了，那么我们就要重点关注(K,V)在经过map处理之后又发生了什么。
+* 现在整体的架构已经清楚了，那么我们之后重点关注(K,V)在经过map处理之后又发生了什么。
 
 ###总结
 * MapTask负责初始化各种输入、处理、输出的对象
-* 输入处理主要是InputFormat对象和RecordReader对象
+* InputFormat对象和RecordReader对象负责将数据封装好输入
 * mapper对象中不断的读取数据，通过map方法去处理
 * map处理之后的数据，缓冲在MapOutputBuffer对象中

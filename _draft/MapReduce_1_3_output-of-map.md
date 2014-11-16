@@ -98,7 +98,7 @@ WritableSerializer中open方法的实现
 * serialize方法是把对象写入指定的输出位置
 
 ***
-###整体看MapOutputBuffer存储
+###整体看MapOutputBuffer存储结构
 ***
 ![overview](/_image/3.0.MapOutputBuffer.png)
 

@@ -1,7 +1,13 @@
 #MapOutputBuffer分析
 
+* MapOutputBuffer中包含有一个缓冲区和相应的操作
+ * 下面将详细介绍的缓冲区
+ * 对缓冲区读取的方法
+ * 对缓冲区写入的方法
+ * 对缓冲区Spill到硬盘的方法（在上一篇文章中介绍过）
+
 ***
-###整体看MapOutputBuffer存储
+###整体看MapOutputBuffer存储结构
 ***
 ![overview](/_image/3.0.MapOutputBuffer.png)
 
