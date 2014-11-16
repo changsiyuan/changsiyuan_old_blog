@@ -157,7 +157,7 @@ collector = new MapOutputBuffer<K,V>(umbilical, job, reporter);
 * 现在整体的架构已经清楚了，那么我们就要重点关注(K,V)在经过map处理之后又发生了什么。
 
 ###总结
-* mapper负责初始化各种输入、处理、输出的对象
-* 输入处理主要是InputFormat和RecordReader
-* mapper中不断的读取数据，交给map去处理
-* map处理之后的数据，缓冲在MapOutputBuffer中
+* MapTask负责初始化各种输入、处理、输出的对象
+* 输入处理主要是InputFormat对象和RecordReader对象
+* mapper对象中不断的读取数据，通过map方法去处理
+* map处理之后的数据，缓冲在MapOutputBuffer对象中

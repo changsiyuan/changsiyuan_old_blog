@@ -23,11 +23,11 @@
 
 ***
 ###FileInputFormat
-来自org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 ***
 * Split是什么呢？如果说你有一个西瓜，几个人一起吃，那么肯定要切开才能吃。
 
-```
+```java
+来自org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 public FileSplit(Path file, long start, long length, String[] hosts) {
     this.file = file;
     this.start = start;
@@ -40,10 +40,10 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 
 ***
 ###TextIputFormat
-来自org.apache.hadoop.mapreduce.lib.input.TextInputFormat
 ***
-这里还是很简单的就是两个方法
-```
+
+```java
+来自org.apache.hadoop.mapreduce.lib.input.TextInputFormat
  public RecordReader<LongWritable, Text> 
     createRecordReader(InputSplit split,
                        TaskAttemptContext context) {
@@ -60,41 +60,41 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 * isSplitable说明是否可以Split，毕竟有的是不可以分割的，比如压缩文件。
 * 这个类的主要目的就是实现这么一个通用的借口，可以非常方便的修改。
 
-***
-###LineReader
-来自org.apache.hadoop.util.LineReader
-***
-readLine方法主要是实现了从一个流中读出一行来
+#####LineReader
+
+该类实现了从一个流中读出一行来，具体实现在readLine方法中
 * LineReader的作用就是从一个文件流中读取一行，就是方法readLine()。这里呢，不对输入做任何的假设，就是当作一个完整的文件读取出一行。
 * readLine()不对输入做任何的假设，就是当作一个完整的文件读取出一行。
 * 重点问题在于行的分界符是不同的，'\n'是Unix风格，'\r\n'是Windows风格，'\r'是MacOS风格。
 
-***
-###LineRecordReader
+#####LineRecordReader
+该类有两个重要功能
+* 把数据封装成KV
+* 处理Split的边界和行的边界不一致的问题
+
+######封装成KV
+```java
 来自org.apache.hadoop.mapreduce.lib.input.LineRecordReader
-***
-####把数据封装称(K,V)
+    nextKeyValue()部分代码{
+        key.set(pos);
+        newSize = in.readLine(value, maxLineLength,
+                                  Math.max((int)Math.min(Integer.MAX_VALUE, end-pos),
+                                  maxLineLength));
+    }
+    public LongWritable getCurrentKey() {
+        return key;
+    }
+
+    public Text getCurrentValue() {
+        return value;
+    }
 ```
-nextKeyValue()部分代码
-key.set(pos);
-newSize = in.readLine(value, maxLineLength,
-                             Math.max((int)Math.min(Integer.MAX_VALUE, end-pos),
-                                                                  maxLineLength));
-```
+* 这几个方法完成了把数据封装成KV形式
 * LineRecordReader中的nextKeyValue()通过LineReader获取数据，然后封装为(K,V),并且提供了getCurrentKey()和getCurrentValue()来分别获得K和V的值。
 * 上面的代码只是nextKeyValue中赋值的两句，可以看出来，K是第几个字节数，V是读入的行的内容
-```
-  public LongWritable getCurrentKey() {
-      return key;
-  }
+* getCurrentKey()或者getCurrentValue()直接看代码吧。
 
-  public Text getCurrentValue() {
-      return value;
-  }
-```
-* 至于getCurrentKey()或者getCurrentValue()则更加简单。
-
-####处理边界不一致的问题
+######处理边界不一致的问题
 
 ```
 initialize()部分代码
@@ -128,13 +128,13 @@ while (pos < end) {
 * initialize()和getKeyValue()对不同MapTask处理的内容做了微微调整，基本上保证了每个Split由一个MapTask处理的语义。
 
 ***
-#实现自己的InputFormat
+###实现自己的InputFormat
 ***
 * 如果你不需要实现自己的Split，仅仅是想修改生成(K,V)的方法，那么只需要修改在createRecordReader中实现一个新的RecordReader对象，并且实现这个RecordReader类就可以了。比如说，每100字节作为一个(K,V)对之类的。
 * 如果需要自定义Split的方法，可以重新实现getSplit方法和相应的对(K,V)边界和Split边界不同的处理
 
 ***
-#总结
+###总结
 ***
 * 这里说了这么多，其实只是看了一些具体的实现，现在梳理结构
 * 对于外部的调用而言，他不需要考虑内部是如何实现将文本转换成(K,V)的，他只需要通过

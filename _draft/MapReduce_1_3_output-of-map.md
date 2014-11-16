@@ -3,7 +3,7 @@
 ###数据在map中的流动
 ***
 ![output-of-map](/_image/2.output-of-map.png)
-* Partition就是实现给数据贴标签功能，标记该数据应该由哪个reduce去处理。
+* Partition就是实现给数据贴标签功能，标记该数据应该由哪个reducer去处理。
 * Serialize
 * 把数据写入内存的缓冲区
 
