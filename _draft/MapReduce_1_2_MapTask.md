@@ -4,13 +4,15 @@
 
 MapTask mapper map直接的关系
 * MapTask类似于OS中一个进程
-* mapper仅仅是其中一个专门处理数据的对象
+* mapper仅仅是其中一个专门处理数据的对象,那么还需要输入数据和输出数据的对象
 * map就是mapper如何处理数据的一个方法
 
 ***
 ###MapTask的流程
 ***
+
 #####MapTask的run()方法
+
 ```
 （来自org.apache.hadoop.mapred.MapTask）
   public void run(final JobConf job, final TaskUmbilicalProtocol umbilical) 
@@ -45,10 +47,10 @@ MapTask mapper map直接的关系
 
 ***
 ###Mapper运行的核心逻辑
-（来自org.apache.hadoop.mapreduce.Mapper）
 ***
 
 ```java
+    （来自org.apache.hadoop.mapreduce.Mapper）
     public void run(Context context) throws IOException, InterruptedException {
         setup(context);
         while (context.nextKeyValue()) {
@@ -62,7 +64,7 @@ MapTask mapper map直接的关系
         context.write((KEYOUT) key, (VALUEOUT) value);
     }
 ```
-流程如下：
+#####流程如下：
 * setup方法做了一些配置，默认是空。
 * 不断的读取下一个&lt;K,V>，并交给map一个一个KV来处理
 * 默认的方法就是什么都不做，输入和输出时一样的
@@ -76,17 +78,19 @@ MapTask mapper map直接的关系
 
 ***
 ###四、输入的实例化
-（来自org.apache.hadoop.mapred.MapTask）
 ***
 #####InputFormat和RecordReader的区别
 * InputFormat和RecordReader的分别初始化，感觉有点奇怪
 * 因为InputFormat关注于文件如何分割，所以有isSplitable、getSplits方法
 * 而RecordReader关注于将一个文件中的内容转换成了键值对
+
 #####以WordCount来举例
 * FileInputFormat将一个文件分成几个split
 * LineRecordReader将文本封装为(K,V),K是偏移字节数，V是每行的内容)
+
 #####InputFormat
-```
+```java
+（来自org.apache.hadoop.mapred.MapTask）
 runNewMapper()部分代码
     // make the input format
     org.apache.hadoop.mapreduce.InputFormat<INKEY,INVALUE> inputFormat =
@@ -95,13 +99,13 @@ runNewMapper()部分代码
 ```
 
 * 这个主要是如何从一个文件分为split，生成一个输入对象
-* 可以看出来，调用了getInputFormatClass，这样可以获取到我们自己设置的输入类，
+* 可以看出来，调用了getInputFormatClass，这样可以获取到我们自己设置的输入类
 * 默认输入方法是TextInputFormat
 
 #####RecordReader
 
-```
-runNewMapper()部分代码
+```java
+runNewMapper()中初始化RecordReader
     org.apache.hadoop.mapreduce.RecordReader<INKEY,INVALUE> input =
       new NewTrackingRecordReader<INKEY,INVALUE>
           (split, inputFormat, reporter, job, taskContext);
@@ -113,14 +117,14 @@ runNewMapper()部分代码
 
 ***
 ###输出的实例化
-（来自org.apache.hadoop.mapred.MapTask）
 ***
 * map处理后的输出是放在缓冲区中
 
 ####RecordWriter
 
-```
-runNewMapper()部分代码
+```java
+（来自org.apache.hadoop.mapred.MapTask）
+runNewMapper()中初始化RecordWriter
        // get an output object
       if (job.getNumReduceTasks() == 0) {
          output =
@@ -151,6 +155,7 @@ collector = new MapOutputBuffer<K,V>(umbilical, job, reporter);
 * 这里可以知道了最终是使用的MapOutputBuffer中的collect()，直接写入了缓存中
 * 收集的数据就是(key,value,partition)三个数据作为一个逻辑单元。至于为什么要加入partition,之后再解释。
 * 现在整体的架构已经清楚了，那么我们就要重点关注(K,V)在经过map处理之后又发生了什么。
+
 ###总结
 * mapper负责初始化各种输入、处理、输出的对象
 * 输入处理主要是InputFormat和RecordReader
