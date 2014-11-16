@@ -28,7 +28,7 @@
 * 在COPY Phase和SORT Pahse时，map处理之后的数据已经收集好了
 * 之后如何获取这些键值对并且处理呢？  注意： reduce()处理(K,List&lt;,V>)形式的**一个**键值对
 * 但是每个map处理之后的数据中肯定非常多而且都是(K,V)形式的，那么是如何把处理所有的键值呢？
-* 这里回答如何不断获取，下面一节回答如何(K,V)->(K,list&lt;V>)
+* 这里回答如何不断获取，下面一节回答如何(K,V)->(K,List&lt;V>)
 * Reducer在运行的时候不断的获得键值对，不断的交给reduce去处理。
 
 ***
@@ -50,10 +50,10 @@
  * reducer使用nextKey判断是否还有下一个数据
  * mapper中使用getCurrentKey和getCurrentValue获取数据
  * reducer中使用getCurrentKey和getValues获取数据
-* 还有一个值得注意的地方是数据源中的数据是(K,V)形式的，而nextKey得到的则是(K,list&lt;V>)
-* 那么如何发生的(K,V)--->(K,list&lt;,V>)呢？下面将解决这个问题
+* 还有一个值得注意的地方是数据源中的数据是(K,V)形式的，而nextKey得到的则是(K,List&lt;V>)
+* 那么如何发生的(K,V)--->(K,List&lt;,V>)呢？下面将解决这个问题
 
-#####(K,V)--->(K,list&lt;,V>)
+#####(K,V)--->(K,List&lt;V>)
 Context继承了ReduceContext,实现的方法都在ReduceContext中
 
 首先，如果自己实现大概会是这个样子的
@@ -83,11 +83,11 @@ Context继承了ReduceContext,实现的方法都在ReduceContext中
 * nextKey中调用nextKeyValue()，将数据从input中取出，并将下一个数据填充到input中
  * 这样key就是存储的当前使用的，value也是当前使用的
  * 对List &lt;V>迭代的时候，如果是读取第一个value，那么直接返回
- * 如果不是第一个value，那么调用nextKeyValue获取下一个V的值，在返回
+ * 如果不是第一个value，那么调用nextKeyValue获取下一个V的值，再返回
  * 如果获取到了最后一个value，那么nextKeyIsSame变成了false，迭代结束
-* 迭代结束的之后，input中存有下一个可以使用的KV，在nextKey中会被读取到，新的一轮有开始了
+* 迭代结束的之后，input中存有下一个可以使用的KV，在nextKey中会被读取到，新的一轮又开始了
 
-应该说，将之前的这个Iterator作为缓冲的中间层，非常优雅的解决了只有一层总是会多读一个KV的问题
+应该说，将输入的这个Iterator作为缓冲的中间层，非常优雅的解决了只有一层总是会多读一个KV的问题
 
 ***
 ###输出的实例化

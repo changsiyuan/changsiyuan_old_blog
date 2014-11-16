@@ -99,16 +99,16 @@ ReduceTask中的run方法
 ```
 #####流程如下：
 * setup方法做了一些配置，默认是空。
-* 不断的读取下一个(K,list&lt;V>)，并交给reduce一个一个KV来处理
+* 不断的读取下一个(K,List&lt;V>)，并交给reduce一个一个KV来处理
 * 默认的reduce方法就是什么都不做，输入和输出时一样的
 * 这里使用的getCurrentKey()和getCurrentValue()是对输入的封装。
 * 这里使用的write方法是对输出对象的封装
 
 #####以WordCount来举例
 * 在COPY Phase和SORT Pahse时，map处理之后的数据已经收集好了
-* 之后如何获取这些键值对并且处理呢？  注意： reduce()处理(K,list&lt;,V>)形式的**一个**键值对
+* 之后如何获取这些键值对并且处理呢？  注意： reduce()处理(K,List&lt;V>)形式的**一个**键值对
 * 但是每个map处理之后的数据中肯定非常多而且都是(K,V)形式的，那么是如何把处理所有的键值呢？
-* 这里回答如何不断获取，下面一节回答如何(K,V)->(K,list&lt;V>)
+* 这里回答如何不断获取，下面一节回答如何(K,V)->(K,List&lt;V>)
 * Reducer在运行的时候不断的获得键值对，不断的交给reduce去处理。
 
 ###总结
