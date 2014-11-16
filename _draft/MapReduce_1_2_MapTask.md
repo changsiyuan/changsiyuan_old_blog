@@ -2,7 +2,7 @@
 #MapTask的数据处理流程
 ***
 
-MapTask mapper map直接的关系
+MapTask mapper map之间的关系
 * MapTask类似于OS中一个进程
 * mapper仅仅是其中一个专门处理数据的对象,那么还需要输入数据和输出数据的对象
 * map就是mapper如何处理数据的一个方法
@@ -11,12 +11,11 @@ MapTask mapper map直接的关系
 ###MapTask的流程
 ***
 
-#####MapTask的run()方法
+#####MapTask的run方法
 
 ```
 （来自org.apache.hadoop.mapred.MapTask）
-  public void run(final JobConf job, final TaskUmbilicalProtocol umbilical) 
-    throws IOException, ClassNotFoundException, InterruptedException {
+  public void run(...) {
     //...一些初始化工作
     runNewMapper(...);
     //...精简代码
@@ -31,9 +30,9 @@ MapTask mapper map直接的关系
 
 ```java
 （来自org.apache.hadoop.mapred.MapTask）
-    runNewMapper(){
+    runNewMapper(...){
         //初始化输入输出操作等对象
-        mapper.run(mapperContext);//处理数据
+        mapper.run(...);//处理数据
         //清理工作
     }
 ```
@@ -67,8 +66,9 @@ MapTask mapper map直接的关系
 #####流程如下：
 * setup方法做了一些配置，默认是空。
 * 不断的读取下一个&lt;K,V>，并交给map一个一个KV来处理
-* 默认的方法就是什么都不做，输入和输出时一样的
+* 默认的map方法就是什么都不做，输入和输出时一样的
 * 这里使用的getCurrentKey()和getCurrentValue()是对RecordReader的封装。
+* write方法是对输出对象的方法的封装
 
 #####以WordCount来举例
 * 类LineRead可以从流中读取一行，类LineRecordReader将这一行变成一个键值对。
