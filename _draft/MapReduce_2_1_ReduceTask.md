@@ -16,7 +16,9 @@ ReduceTask reducer reduce之间的关系
 
 ```java
   public void run(...){
+    //copyPhase
     copyPhase.complete();// copy is already complete
+    //sortPhase
     sortPhase.complete();// sort is complete
     runNewReducer(...);
   }
@@ -31,6 +33,50 @@ ReduceTask reducer reduce之间的关系
  * COPY Phase
  * SORT Phase
  * REDUCE Phase
+
+***
+###COPY Phase
+***
+```java
+    ReduceTask中的run方法部分代码
+    boolean isLocal = "local".equals(job.get("mapred.job.tracker", "local"));
+    if (!isLocal) {
+      reduceCopier = new ReduceCopier(umbilical, job, reporter);
+      if (!reduceCopier.fetchOutputs()) {
+        if(reduceCopier.mergeThrowable instanceof FSError) {
+          throw (FSError)reduceCopier.mergeThrowable;
+        }
+        throw new IOException("Task: " + getTaskID() + 
+            " - The reduce copier failed", reduceCopier.mergeThrowable);
+      }
+    }
+    copyPhase.complete();                         // copy is already complete
+```
+* 如果不是local执行的模式，那么需要使用ReduceCopier从其他机器上将map处理完的数据复制过来
+* fetchOutputs方法是复制数据的主要实现
+* 和其他机器通信使用的是HTTP协议
+* 复制过来的数据，部分存在硬盘中，部分存在内存中
+
+***
+###SORT Phase
+***
+```
+ReduceTask中的run方法
+    final FileSystem rfs = FileSystem.getLocal(job).getRaw();
+    RawKeyValueIterator rIter = isLocal
+      ? Merger.merge(job, rfs, job.getMapOutputKeyClass(),
+          job.getMapOutputValueClass(), codec, getMapFiles(rfs, true),
+          !conf.getKeepFailedTaskFiles(), job.getInt("io.sort.factor", 100),
+          new Path(getTaskID().toString()), job.getOutputKeyComparator(),
+          reporter, spilledRecordsCounter, null)
+      : reduceCopier.createKVIterator(job, rfs, reporter);
+        
+    // free up the data structures
+    mapOutputFilesOnDisk.clear();
+    sortPhase.complete();
+```
+* 将数据都复制过来之后，每个map处理之后的数据都是一个文件
+* 需要将这些数据再次封装成KV
 
 ***
 ###Reducer运行的核心逻辑
@@ -53,35 +99,19 @@ ReduceTask reducer reduce之间的关系
 ```
 #####流程如下：
 * setup方法做了一些配置，默认是空。
-* 不断的读取下一个&lt;K,V>，并交给reduce一个一个KV来处理
+* 不断的读取下一个(K,list&lt;V>)，并交给reduce一个一个KV来处理
 * 默认的reduce方法就是什么都不做，输入和输出时一样的
 * 这里使用的getCurrentKey()和getCurrentValue()是对输入的封装。
 * 这里使用的write方法是对输出对象的封装
 
 #####以WordCount来举例
 * 在COPY Phase和SORT Pahse时，map处理之后的数据已经收集好了
-* 之后如何获取这些键值对并且处理呢？  注意： reduce()只处理**一个**键值对
-* 但是每个map处理之后的数据中肯定非常多，那么是如何把处理所有的键值呢？
-* 答案就是这里，Reducer在运行的时候不断的获得键值对，不断的交给reduce去处理。
+* 之后如何获取这些键值对并且处理呢？  注意： reduce()处理(K,list&lt;,V>)形式的**一个**键值对
+* 但是每个map处理之后的数据中肯定非常多而且都是(K,V)形式的，那么是如何把处理所有的键值呢？
+* 这里回答如何不断获取，下面一节回答如何(K,V)->(K,list&lt;V>)
+* Reducer在运行的时候不断的获得键值对，不断的交给reduce去处理。
 
-***
-###输入的实例化
-***
-
-```
-    ReduceTask中的run方法
-    RawKeyValueIterator rIter = reduceCopier.createKVIterator(job, rfs, reporter);
-    这个是Reducer的输入，就是将收集到的map输出封装成KV
-
-    之后在runNewReducer中又对该Iterator进行了一些封装。
-```
-***
-###输出的实例化
-***
-```
-     org.apache.hadoop.mapreduce.RecordWriter<OUTKEY,OUTVALUE> trackedRW = 
-       new NewTrackingRecordWriter<OUTKEY, OUTVALUE>(reduceOutputCounter,
-         job, reporter, taskContext);
-```
-* 这个起始就是对FileOutputFormat的封装
-* FileOutputFormat和FileInputFormat比较类似，这里不再赘述
+###总结
+* COPY阶段将所有分散在其他机器上的map处理过的数据收集过来
+* SORT将这么多的文件组织成KV对
+* reducer负责处理数据
