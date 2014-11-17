@@ -10,7 +10,7 @@
 * fetchOutputs
 * GetMapEventThread
 * MapOutputCopier
-* InMemFSmerger
+* InMemFSMergeThread 
 * LocalFSMerger
 
 ***
@@ -26,7 +26,7 @@
 * MapOutputCopier
  * 根据各种Map结果的记录，来获取数据
  * 小的文件保存在内存中，大文件保存在硬盘中
-* InMemFSmerger
+* InMemFSMergeThread 
  * 将内存中的数据写入硬盘中，减小内存占用
 * LocalFSMerger
  * 文件较多的时候，将硬盘中的文件merge，减少文件个数
@@ -71,7 +71,7 @@ map结果分类记录和各个线程之间的关系还是很复杂的。
  * MapOutput为实际上每个内存中文件的存储对象
 * 存入硬盘的文件由mapOutputFilesOnDisk索引
 
-#####InMemFSmerger
+#####InMemFSMergeThread
 * ShuffleRamManager中的waitForDataToMerge决定了Merge的条件
 * 一共由四个
 * 执行Merge的过程doInMemMerge
