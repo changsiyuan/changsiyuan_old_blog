@@ -97,6 +97,6 @@ Context继承了ReduceContext,实现的方法都在ReduceContext中
        new NewTrackingRecordWriter<OUTKEY, OUTVALUE>(reduceOutputCounter,
          job, reporter, taskContext);
 ```
-* 这个起始就是对FileOutputFormat的封装
+* 这个其实就是对FileOutputFormat的封装
 * FileOutputFormat和FileInputFormat比较类似，这里不再赘述
 数据来自硬盘和内存
