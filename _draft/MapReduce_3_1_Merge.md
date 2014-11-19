@@ -47,6 +47,9 @@
 * (ReduceTask中SORT Phase)createKVIterator
 
 #####（MapTask）将溢写文件合并
+![Merge合并硬盘中的文件](/_image/5.1.Merge.png)
+* 图中只画了数据文件的合并，当然数据文件也是合并的
+* 这里可以清晰的看出来Segment和文件中的Partition部分如何对应
 * MapOutputBuffer中的mergeParts方法实现了这个操作
 * 文件来源：Spill后的溢写文件。读入使用IFile.Reader类
 * 写入使用IFile.Writer类，最后只有一个文件
@@ -56,6 +59,8 @@
 * 如果由combine在写入硬盘前会执行combine
 
 #####(ReduceTask中COPY Phase)InMemFSMergeThread
+![将内存中的数据变成Segment](/_image/5.2.InMemFSMergeThread.png)
+* 图中就是如何将内存中存储的文件(MapOutput对象)变成Segment对象
 * 数据来源：内存中的数据文件，存储结构结构是MapOutput,通过mapOutputsFilesInMemory索引
 * createInMemorySegments将内存中一个文件封装成一个Segment，最后得到一个List&lt;Segment&lt;K, V>> inMemorySegments
 * 读取的时候使用InMemoryReader
@@ -63,6 +68,8 @@
 * Merge之后的文件写入硬盘，通过mapOutputFilesOnDisk索引
 
 #####LocalFSMerger
+![Merge合并硬盘中的文件](/_image/5.1.Merge.png)
+* 这里和Map端的Merge类似
 * Merger.merge封装成Iterator
 * Merger.writeFile写入文件
 
