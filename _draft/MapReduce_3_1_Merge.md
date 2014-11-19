@@ -21,7 +21,7 @@
 * Segment是什么
  * 每个溢写文件都是按照Partition排序的，就是说，相同Partition的都是连续存放的
  * 一个文件中相同Partition的部分就是一个Segment
- * 就是记录一下下面几个参数
+ * 就是记录一下下面几个参数,可以看看下面的图，比较清晰
 
 ```
     FileSystem fs;

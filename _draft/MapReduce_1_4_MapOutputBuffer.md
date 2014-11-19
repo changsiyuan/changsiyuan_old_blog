@@ -1,10 +1,11 @@
 #MapOutputBuffer分析
 
-* MapOutputBuffer中包含有一个缓冲区和相应的操作
+* MapOutputBuffer中包含有一个缓冲区和相应的操作（包含的内容非常多）
  * 下面将详细介绍的缓冲区
  * 对缓冲区读取的方法
  * 对缓冲区写入的方法
  * 对缓冲区Spill到硬盘的方法（在上一篇文章中介绍过）
+ * 将Spill文件合并成一个的MergeParts过程也在这里
 
 ***
 ###整体看MapOutputBuffer存储结构

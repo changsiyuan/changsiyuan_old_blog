@@ -211,6 +211,7 @@ IFile中Writer的append方法：
 ###Merge
 ***
 
+![Merge合并硬盘中的文件](/_image/5.1.Merge.png)
 * Spill过程会执行多次，生成多个溢写文件
 * merge过程就是将这么多的溢写的文件合并成一个文件,并且保持以下性质
  * 之前的多个文件是先按照partition来排序，partition相同的则按照key来排序的
