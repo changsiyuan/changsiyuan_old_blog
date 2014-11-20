@@ -16,6 +16,31 @@
 * 如何进行封装来屏蔽文件来源的复杂性？请看Segment小节
 * 如何对数据再次进行排序？请看MergeQueue小节
 
+###IFile
+* Merge和IFile类紧密的联系在一起
+* 从map处理过的数据Spill到硬盘上的使用IFile.Writer来写入的
+* 直到reduce的读入，硬盘中的文件也是使用的IFile.Reader
+* 在这之中读写硬盘，都是使用的IFile.Reader或者是IFile.Writer
+* IFile在硬盘中的存储格式就是像下面这样
+![spillfile](/_image/3.5.spill.png)
+
+#####索引文件和IndexRecord
+```java
+IndexRecord中的结构
+  long startOffset;
+  long rawLength;
+  long partLength;
+```
+
+#####每条记录的结构
+```
+IFile中Writer的append方法：
+
+   WritableUtils.writeVInt(out, keyLength);                  // key length
+   WritableUtils.writeVInt(out, valueLength);                // value length
+   out.write(buffer.getData(), 0, buffer.getLength());       // data
+```
+
 ###Segment
 * 前面讲到，文件的来源很复杂，应该将文件来源封装成一个简单的Iterator
 * Segment是什么

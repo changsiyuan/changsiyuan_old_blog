@@ -1,4 +1,4 @@
-#Copy Phase & Sort Phase
+#Copy Phase
 ***
 
 ###概述COPY Phase
@@ -71,7 +71,15 @@ map结果分类记录和各个线程之间的关系还是很复杂的。
  * MapOutput为实际上每个内存中文件的存储对象
 * 存入硬盘的文件由mapOutputFilesOnDisk索引
 
+#####LocalFSMerger
+![Merge合并硬盘中的文件](/_image/5.1.Merge.png)
+* 这里和Map端合并溢写文件基本类似
+* 这个就是普通的Merge过程
+* 之后会有对Merge的详细分析
+
 #####InMemFSMergeThread
+![将内存中的数据变成Segment](/_image/5.2.InMemFSMergeThread.png)
+* 图中就是如何将内存中存储的文件(MapOutput对象)变成Segment对象
 * ShuffleRamManager中的waitForDataToMerge决定了Merge的条件
 * 一共由四个
 * 执行Merge的过程doInMemMerge
@@ -79,6 +87,4 @@ map结果分类记录和各个线程之间的关系还是很复杂的。
  * 可能由combine
  * 写入硬盘的文件由mapOutputFilesOnDisk索引
  * 写入使用IFile.Writer
- 
-#####LocalFSMerger
-* 这个就是普通的Merge过程
+* 之后由对Merge的详细分析

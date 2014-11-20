@@ -15,6 +15,10 @@ ReduceTask reducer reduce之间的关系
 ***
 
 ```java
+  在类初始化的时候，
+  setPhase(TaskStatus.Phase.SHUFFLE);
+  
+  之后运行的run函数
   public void run(...){
     //copyPhase
     copyPhase.complete();// copy is already complete
