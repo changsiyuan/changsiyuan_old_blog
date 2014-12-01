@@ -3,7 +3,7 @@
 
 MapRduce框架的变化
 * 最初整个框架包括三部分,1.x中的MapReduce V1
- * MapReduce的旧API(mapred)-------->新API(mapreduce)。如果是实现的map和reduce接口，那么就是使用的旧API。如果是extends mapper和reducer，那么就是使用的新API
+ * MapReduce的旧API(mapred)和新API(mapreduce)。如果是实现的map和reduce接口，那么就是使用的旧API。如果是extends mapper和reducer，那么就是使用的新API
  * 计算框架，没有变化就是MapTask和ReduceTask
  * 运行环境，JobTracker，TaskTracker
 
