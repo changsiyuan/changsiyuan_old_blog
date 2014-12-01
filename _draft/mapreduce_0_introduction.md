@@ -1,11 +1,17 @@
 ##1.基本的概念
 ***
 
->MapReduce有两个版本。
+MapRduce框架的变化
+* 最初整个框架包括三部分,1.x中的MapReduce V1
+ * MapReduce的旧API(mapred)-------->新API(mapreduce)。如果是实现的map和reduce接口，那么就是使用的旧API。如果是extends mapper和reducer，那么就是使用的新API
+ * 计算框架，没有变化就是MapTask和ReduceTask
+ * 运行环境，JobTracker，TaskTracker
 
->MRv1是Hadoop 1.0中的MapReduce实现，它由编程模型（新旧编程接口）、运行时环境（由JobTracker和TaskTracker组成）和数据处理引擎（MapTask和ReduceTask）三部分组成。
-
->MRv2是Hadoop 2.0中的MapReduce实现，它在源码级重用了MRv1的编程模型和数据处理引擎实现，但运行时环境由YARN和ApplicationMaster组成。
+* 后来将第三部分运行环境从MapReduce框架中拆分出来，变成了Yarn
+* 就是说，MapReduce
+ * 计算框架
+ * 新旧API
+* 这就是MapReduce V2，也叫做MapReduce On Yarn
 
 本系列主要是分析MapReduce框架中的数据处理引擎，简要的介绍编程模型，至于如何搭建Hadoop，运行时的环境，如何编程什么的都不会介绍。先完整分析整个MapReduce v1的实现流程，在此基础上，分析如何MapReduce on Yarn(MapReduce v2)进行了那些改进，只有比较才能看出来后者由什么优势。
 
