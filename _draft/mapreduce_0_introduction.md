@@ -2,16 +2,15 @@
 ***
 
 MapRduce框架的变化
-* 最初整个框架包括三部分,1.x中的MapReduce V1
- * MapReduce的旧API(mapred)和新API(mapreduce)。如果是实现的map和reduce接口，那么就是使用的旧API。如果是extends mapper和reducer，那么就是使用的新API
- * 计算框架，没有变化就是MapTask和ReduceTask
+* 最初整个框架包括三部分(1.x中的MapReduce V1)
+ * MapReduce的旧API(mapred)和新API(mapreduce)。如果是实现的map和reduce interface，那么就是使用的旧API。如果是mapper和reducerc抽象类，那么就是使用的新API。
+ * 计算框架，MapTask，ReduceTask
  * 运行环境，JobTracker，TaskTracker
 
 * 后来将第三部分运行环境从MapReduce框架中拆分出来，变成了Yarn
-* 就是说，MapReduce
- * 计算框架
+* MapReduce V2,也叫做MapReduce On Yarn
+ * 计算框架MapReduce
  * 新旧API
-* 这就是MapReduce V2，也叫做MapReduce On Yarn
 
 本系列主要是分析MapReduce框架中的数据处理引擎，简要的介绍编程模型，至于如何搭建Hadoop，运行时的环境，如何编程什么的都不会介绍。先完整分析整个MapReduce v1的实现流程，在此基础上，分析如何MapReduce on Yarn(MapReduce v2)进行了那些改进，只有比较才能看出来后者由什么优势。
 
@@ -27,15 +26,17 @@ MapReduce分为以下几个阶段（TaskStatus）
 * REDUCE
 * CLEANUP
 
-关于SHUFFLE这里是一种说法,还有就是说从MAP输出后到REDUCE开始这之间都是SHUFFLE。那么，之后如果提到第一种，就称为SHUFFLE PHASE，第二种直接称为SHUFFLE。
+关于SHUFFLE这里是一种说法,还有一种说法就是说从MAP输出后到REDUCE开始这之间都是SHUFFLE。那么，之后如果提到第一种，就称为SHUFFLE PHASE，第二种直接称为SHUFFLE。
 
 其中SHUFFLE PHASE最为复杂，这也最重要的地方。
 
 ####WordCount为例，处理的流程
 
-一般来讲，MapReduce的框架在处理数据的时候是这样的。以WordCount为例，一个文本变成了多个(K1,V1)，然后自己可以在map中处理这个键值对，生成一个新的键值对(K2,V2)，在reduce中又可以处理一个新的键值对(K2，list&lt;V2>)，处理的结果会变成文本输出。
+一般来讲，MapReduce的框架在处理数据的时候是这样的。以WordCount为例，一个文本变成了多个(K1,V1)，然后自己可以在map中处理这个键值对，生成一个新的键值对(K2,V2)，然后通过一个复杂的流程，在reduce可以得到map处理完毕的数据(K2，list&lt;V2>)，处理的结果会变成文本输出。
 
-应该说MapReduce框架隐藏了大量的实现细节，本系列采取问题驱动，每篇文章解决一个问题，下面的一些问题会在后面得到完整的解答。
+应该说MapReduce框架隐藏了大量的实现细节，map的处理过程，reduce的处理过程，将map处理后的数据传输给reduce的过程是shuffle，那么它是如何实现的等等。
+
+本系列采取问题驱动，每篇文章解决一个问题，下面的一些问题会在后面得到完整的解答。
 
 ####关于流程的小问题
 
@@ -48,7 +49,7 @@ MapReduce分为以下几个阶段（TaskStatus）
 
 1. map的输出是如何管理的，reduce的输入又是从何而来，两者之间有什么关系？
 2. map输出是(K,V)，那么为什么reduce的输入是(K,list&lt;V>)？
-3. 相同的K可能会分配在不同的机器上，为什么reduce能够得到所有的数据，而且还是(K,list&lt;V>)形式的
+3. 相同的K可能会分配在不同的机器使用map处理，为什么reduce能够得到所有的数据，而且还是(K,list&lt;V>)形式的
 4. 为什么要排序，如何实现的排序？
 5. 什么是merge，为什么要merge,merge和spill有什么关系？
 6. map reduce combine有什么关系？

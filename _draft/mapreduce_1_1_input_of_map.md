@@ -2,10 +2,10 @@
 ***
 这里解答第一个问题，文本怎么变成(K,V)的。
 一个大体的流程就是:
-* 首先把一个文件分成几个Split，每个Split交给一个MapTask去处理。
-* 那么什么是Split？如何划分的Split?如何处理这个Split呢？Split和单个文件内容上有什么关系，使用上有什么区别？
+* 首先把一个文件按照大小均分成几个Split，每个Split交给一个MapTask去处理。
+ * 那么什么是Split？按照大小划分的Split是不是太随意了?如何处理这个Split呢？Split和单个文件内容上有什么关系，使用上有什么区别？
 * 以TextInputFormat为例，每个Split被最终变成了一些(K,V)，每个(K,V)代表一行，K是该行开始在文件中第几个字节，V是该行的内容。
-* 那么问题来了，Split是直接按照大小分的，而每行则是按照'\n'(如果是UNIX风格，当然还有其他的划分方法)来划分的，这两者之间的分界线显然不是相同的，如何处理这两者的不同呢？
+ * Split怎么变成(K,V)的？Split是直接按照大小分的，而每行则是按照'\n'来划分的，这两者之间的分界线一般情况下都是不同的，那么横跨两个Split的一行，交给那个MapTask处理？
 
 ***
 ###类之间的关系以及功能
@@ -13,12 +13,13 @@
 
 ![TextInputFormat](/_image/1.TextInputFormat.png)
 
-* 可以看出来InputFormat就是一个抽象的基类。
-* FileInputFormat实现了一个重要的方法getSplits()。这个方法将一个文件进行分割成不同的Split。
-* 而TextInputFormat则仅仅是使用createRecordReader创建了一个对象，该对象是负责把Split变成生成(K,V)的。可以知道这个对象是LineRecordReader类
-* 不过，首先看一下LineRecordReader中使用的一个辅助类LineReader
+* 使用TextInputFormat为例。
+* InputFormat就是一个抽象的基类。
+* FileInputFormat实现了一个重要的方法getSplits()。getSplits()将一个文件均分成不同的Split。
+* 而TextInputFormat则仅仅是使用createRecordReader创建了一个对象，该对象是负责把Split变成生成(K,V)的。具体实现在LineRecordReader类
+* 首先看一下LineRecordReader中使用的一个辅助类LineReader
 * LineReader的作用就是从一个文件流中读取一行，至于这些数据如何变成(K,V)的和这个类是没有关系的。
-* LineRecordReader中的nextKeyValue()通过LineReader获取数据，然后封装为(K,V),并且提供了getCurrentKey()和getCurrentValue()来分别获得K和V的值。
+* LineRecordReader中的nextKeyValue()通过LineReader获取一行数据，字节偏移作为K，读入数据作为V，封装为(K,V)，并且提供了getCurrentKey()获取K的值，getCurrentValue()V的值。
 * LineRecordReader通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
 
 ***
@@ -36,6 +37,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
 }
 ```
 * 从Split的构造函数可以看出来，这里只是记录了一些每个Split对应的开始和范围，所有的Split还是一个文件。
+* 本质上就是均分了一个文件成几个独立得块。
 * 就像切西瓜一样，每个MapTask分到了一个Split
 
 ***
@@ -90,7 +92,7 @@ public FileSplit(Path file, long start, long length, String[] hosts) {
     }
 ```
 * 这几个方法完成了把数据封装成KV形式
-* LineRecordReader中的nextKeyValue()通过LineReader获取数据，然后封装为(K,V),并且提供了getCurrentKey()和getCurrentValue()来分别获得K和V的值。
+* LineRecordReader中的nextKeyValue()通过LineReader获取一行数据，字节偏移作为K，读入数据作为V，封装为(K,V)，并且提供了getCurrentKey()获取K的值，getCurrentValue()V的值。
 * 上面的代码只是nextKeyValue中赋值的两句，可以看出来，K是第几个字节数，V是读入的行的内容
 * getCurrentKey()或者getCurrentValue()直接看代码吧。
 
@@ -121,10 +123,12 @@ while (pos < end) {
 ```
 
 * 通过initialize()和nextKeyValue()的组合来处理行的边界和Split的边界不一致的问题
-* 读取的停止条件可以看出，每次都是读取完整的一行的，即使是超过了Split的边界(其实这个边界就是相当于是一个约定而已，可以做稍微的调整)。
-* 那么，假设有邻近的两块，第二块的开头已经被读过了，那么怎么保证不重复读取呢？第二块跳过第一个'\n'之前的内容。
-* 但是如果是第一块呢，不应该跳过，那么就不跳。结果就是initialize()中的判断是否跳过第一个'\n'之前的内容。
-* 注意，第一个'\n'之前的内容和第一行的内容，这两者的含义是不同，一行的内容应该是完整的，但是第二块中的第一行可能一部分在第一块的末尾，一部分在第二块的开头.
+* nextKeyValue()读取的停止条件可以看出，每次都是读取完整的一行的，即使是超过了Split的边界(其实这个边界就是相当于是一个约定而已，可以做稍微的调整)。
+* 假设有邻近的两块，那么第二块的开头已经被读过了，那么怎么保证不重复读取呢？读取第二块时，默认开头已经读取过了，跳过第一个'\n'之前的内容。
+* 但是如果是第一块呢，没有读取过那么就不跳。结果就是initialize()中的判断是否跳过第一个'\n'之前的内容。
+* 注意，每个Split中第一个'\n'之前的内容和横跨两个Split的一行的内容，这两者的含义是不同，
+ * 第一个Split中的'\n'的之前的内容是完整得一行。
+ * 但是后面得其他Split中的'\n'的之前的内容是可能就不是完整的一行,一部分在前一Split的末尾，一部分在当前Split的开头.
 * initialize()和getKeyValue()对不同MapTask处理的内容做了微微调整，基本上保证了每个Split由一个MapTask处理的语义。
 
 ***
@@ -136,13 +140,12 @@ while (pos < end) {
 ***
 ###总结
 ***
-* 这里说了这么多，其实只是看了一些具体的实现，现在梳理结构
 * 对于外部的调用而言，他不需要考虑内部是如何实现将文本转换成(K,V)的，他只需要通过
  * initialize()来实现初始化
  * nextKeyValue()就可以判断是否还有可以使用的(K,V)
  * getCurrentKey()获取当前的Key值
  * getCurrentValue()获取当前的Value值
-* 至于内部是如何分片，如何读取一行是和他没有关系的
+* 至于内部是Split如何切割，如何读取一行是和他没有关系的
  * 内部实现保证每个Split由一个MapTask处理的语义
- * 内部实现保证每个K,V的语义
+ * 内部实现保证每个(K,V)的语义
 * 那么这些方法具体是怎么使用的呢？请看下一部分对MapTask的介绍

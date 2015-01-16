@@ -47,7 +47,7 @@
 ###关于缓冲区的设计
 ***
 
-* 这里需要满足的两个目标是不定长的数据和排序
+* 这里需要满足的两个目标是存储不定长的数据和对这些数据排序
 * 对于不定长的数据来讲，一般的存储方法就是使用索引(起始位置,长度)
 * 就是说(startOfPartition,lengthOfPartition,startOfKey,lengthOfKey,startOfValue,lengthOfValue)
 * 如果排序的话，将这个作为单位来移动。

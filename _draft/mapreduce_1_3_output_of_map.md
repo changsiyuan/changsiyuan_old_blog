@@ -29,7 +29,7 @@ public void write(K key, V value) throws IOException, InterruptedException {
 }
 ```
 * 上次说到，存入的数据是(key,value,partition)三个数据，那么partition是用来干什么的呢？
-* 前面说过Split是为了分西瓜给MapTask吃，输出的数据应该分给不同的reduce去处理，那么怎么标示这个数据分给哪个reduce呢？
+* 前面说过Split是为了分西瓜给MapTask吃，map输出的数据应该分给不同的reduce去处理，那么怎么标示这个数据分给哪个reduce呢？
 * Partition就是实现给数据贴标签功能，就是再次切西瓜把西瓜分好,具体的实现就是使用数字来标记。
 
 ####Partitioner的实例化
@@ -114,7 +114,7 @@ WritableSerializer中open方法的实现
 ***
 ###Spill
 ***
-* 如果内存缓冲区的数据到达一定的条件，就要把数据写入硬盘，以免占用太多硬盘
+* 如果内存缓冲区的数据到达一定的条件，就要把数据写入硬盘，以免占用太多内存
 * spillThread调用的是sortAndSpill()
 * sort就是先使用的是QuickSort()对内存缓冲区中需要写硬盘上的这部分数据进行排序
 * 然后使用Writer写入硬盘。
@@ -161,7 +161,7 @@ WritableSerializer中open方法的实现
     }
 ```
 
-* 就一个排序过程来讲，起始就是需要两个操作，比较大小，和交换位置。
+* 就一个排序过程来讲，其实就是需要两个操作，比较大小，和交换位置。
 * 这里排序的设计是相当精彩的。
 * 从compare中看出来，先根据partition的大小来排序，再根据key来排序。
 * 排序实际上仅仅是改变了kvoffsets中的数据，其他的没有任何的改变。
@@ -173,9 +173,10 @@ WritableSerializer中open方法的实现
 #####溢写文件的结构
 ![spillfile](/_image/3.5.spill.png)
 
-* Spill的过程，是相同Partition的数据一起写入
+* Spill的过程，相同Partition的数据连续写入，相同Partition按照Key排序，不同Partition之间使用Partition排序。
 * 数据文件中，相同Partition的文件是连续存放的，指定每一部分的长度就可以了。
-* 就是说每个Partition有一个IndexRecord记录就可以
+* 就是说每个Partition有一个IndexRecord记录就可以。
+* 有专门得索引文件来存储所有的索引。
 
 
 ####combiner

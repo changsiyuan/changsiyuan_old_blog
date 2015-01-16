@@ -23,7 +23,7 @@ MapTask mapper map之间的关系
 ```
 
 * MapTask就是做一些初始化工作，然后调用runNewMapper方法
-* 和名字一样，runNewMapper就是启动Mapper
+* 和名字一样，runNewMapper就是启动mapper
 * runNewMapper中的New是指使用了新的API
 
 #####runNewMapper方法的几个作用
@@ -45,11 +45,11 @@ MapTask mapper map之间的关系
 * 最后清理工作
 
 ***
-###Mapper运行的核心逻辑
+###mapper运行的核心逻辑
 ***
 
 ```java
-    （来自org.apache.hadoop.mapreduce.Mapper）
+（来自org.apache.hadoop.mapreduce.Mapper）
     public void run(Context context) throws IOException, InterruptedException {
         setup(context);
         while (context.nextKeyValue()) {
@@ -65,10 +65,11 @@ MapTask mapper map之间的关系
 ```
 #####流程如下：
 * setup方法做了一些配置，默认是空。
-* 不断的读取下一个&lt;K,V>，并交给map一个一个KV来处理
+* 不断的读取下一个(K,V)，并交给map逐个处理KV
 * 默认的map方法就是什么都不做，输入和输出时一样的
-* 这里使用的getCurrentKey()和getCurrentValue()是对RecordReader的封装。
-* write方法是对输出对象的方法的封装
+* 这里使用的getCurrentKey()是对RecordReader的getCurrentKey()的封装。
+* 这里使用的getCurrentValue()是对RecordReader的getCurrentValue()对应封装。
+* write方法是对输出对象的write方法的封装
 
 #####以WordCount来举例
 * 类LineRead可以从流中读取一行，类LineRecordReader将这一行变成一个键值对。
@@ -86,7 +87,7 @@ MapTask mapper map之间的关系
 
 #####以WordCount来举例
 * FileInputFormat将一个文件分成几个split
-* LineRecordReader将文本封装为(K,V),K是偏移字节数，V是每行的内容)
+* LineRecordReader将文本封装为(K,V),K是偏移字节数，V是每行的内容。
 
 #####InputFormat
 ```java
@@ -136,7 +137,7 @@ runNewMapper()中初始化RecordWriter
 
 #####NewOutputCollector中的write()
 
-可以从map的运行中看出，调用的输出对象context的write方法,其实就是out的write方法
+* 可以从map的运行中看出，调用的输出对象context的write方法,其实就是out的write方法
 
 ```
   public void write(K key, V value) throws IOException, InterruptedException {

@@ -15,6 +15,9 @@ tags : [CentOS]
 找到Settings程序
 **Settings**->**region and language**
 ###2.第三方源
+
+http://fedoraproject.org/wiki/EPEL/FAQ#howtouse
+
 #####epel
 
 ```
@@ -28,6 +31,7 @@ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.
 ```
 ###3.ntfs
 ```
+需要epel
 yum install ntfs-3g
 ```
 ###4.chrome
@@ -51,7 +55,7 @@ set formatoptions+=mM
 set fencs=utf-8,gbk
 ````
 
-#####gedit中文支持
+#####gedit3中文支持
 
 ```
 gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8','CURRENT','GB18030','ISO-8859-15','UTF-16']"
