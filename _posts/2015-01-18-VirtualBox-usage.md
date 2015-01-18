@@ -45,27 +45,40 @@ yum install kernel kernel-devel kernel-headers
 ##3.虚拟机瘦身
 ***
 ####Windows虚拟机
-1.在虚拟机中
-* 下载Sysinternals Suite并执行
+
+* 1.在虚拟机中
+
+下载Sysinternals Suite并执行
+
 ```
 sdelete –z
 ```
-2.在CentOS上
+
+* 2.在CentOS上
+
 ```
 VBoxManage modifyhd mydisk.vdi --compact
 ```
+
 ####Linux虚拟机
-1.在虚拟机中
+
+* 1.在虚拟机中
+
 ```
 sudo dd if=/dev/zero of=/EMPTY bs=1M
 sudo rm -f /EMPTY
 ```
-2.在CentOS上
+
+* 2.在CentOS上
+
 ```
 VBoxManage modifyhd mydisk.vdi --compact
 ```
+
 ####4.Cannot register the hard disk，because a hard already exists
-重新指定一个UUID就可以了
+
+* 重新指定一个UUID就可以了
+
 ```
 VBoxManage  internalcommands sethduuid mydisk.vdi
 ```
