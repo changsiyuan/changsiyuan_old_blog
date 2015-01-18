@@ -9,6 +9,24 @@ tags : [CentOS]
 
 
 ***
+##安装提示
+***
+
+* 选择Gnome Desktop后，把开发环境也勾选上，这样可以方便编译一些软件。
+* 安装完成之后可能没有windows的引导
+ * 将以下代码添加进/etc/grub.d/40_custom
+```
+menuentry "Windows"{
+    set root=(hd0,1)
+    chainloader +1
+}
+```
+ * 然后更新引导
+```
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+
+***
 ##日常使用
 ***
 ###1.中文输入法
@@ -73,8 +91,7 @@ yum install audacious audacious-plugins-freeworld
 
 ```
 yum install vlc
-yum install ffmpeg
-yum install gstreamer gstreamer-ffmpeg gstreamer-plugins-base gstreamer-plugins-good gstreamer-plugins-bad gstreamer-plugins-bad-free gstreamer-plugins-bad-nonfree  gstreamer-plugins-ugly 
+yum remove totem
 ```
 
 #####如果VLC字幕乱码
@@ -83,7 +100,24 @@ yum install gstreamer gstreamer-ffmpeg gstreamer-plugins-base gstreamer-plugins-
 *  接着点开：输入／编码－其它编码器－字幕 右侧的 字幕文本编码 选 GB18030
 *  然后 把 自动检测 UTF－8  和字幕 格式化字幕 前面的勾去掉
 
-####8.画图软件gimp
+####8.WPS的安装
+* 从WPS的官网下载安装包wps-office-9.1.0.4945-1.a16p3.i686.rpm
+* 使用yum install,不要使用rpm -ivh
+
+```
+yum install wps-office-9.1.0.4945-1.a16p3.i686.rpm
+```
+* 安装之后还有公式的字体问题下载symbol－fonts_all.deb
+* 解压之后可以找到字体，将这些字体复制到~/.fonts中(如果没有该文件夹，就新建一个)
+
+```
+cd ~/.fonts
+mkfontscale
+mkfontdir
+fc-cache
+```
+
+####9.画图软件gimp
 
 ```
 yum install gimp
@@ -102,13 +136,42 @@ yum install transmission
 ```
 yum update
 yum install kernel-devel
-yum groupinstall 'Development Tool'
+yum groupinstall 'Development Tools'
 ```
-###2.virtualbox(XP)（可能需要内核开发包）
+###2.virtualbox(XP)
+* 如果无法启动虚拟机，需要重新编译vbox的内核模块
+* 如果安装的时候安装了开发环境，那么kernel-devel和kernel-headers不需要安装了
+
+```
+/etc/init.d/vboxdrv setup
+```
+* 如果没有安装，下面安装的kernel-devel和当前内核不一定匹配
+* 最好升级一下内核，然后从最新得内核中启动，再安装
+
+```
+yum install kernel kernel-devel kernel-headers
+从最新内核重启
+/etc/init.d/vboxdrv setup
+```
+
+
 ###3.vim 插件
 neocomplcache和tagslist
-###4.eclipse
-#####eclipse的快捷方式，图片太大,可以右键resize
+###4.Java开发环境配置
+
+```
+yum install java-1.7.0-openjdk
+yum install java-1.7.0-openjdk-devel
+echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk' >> ~/.bashrc
+```
+###5.Java IDE配置
+#####Eclipse
+
+* Eclipse的快捷方式
+ * 图片icon.xmp太大,可以右键resize(33%),然后保存为icon.png
+* 将下面的内容写入文本，命名为Eclipse.desktop
+ * 其中的Exec是启动的eclipse的路径
+ * Icon是图标所在的路径
 ```
 [Desktop Entry]
 Version=1.0
@@ -120,15 +183,60 @@ Type=Application
 Categories=Development;
 ```
 
-#####编辑器的插件(高亮插件)
-http://blog.csdn.net/ichsonx/article/details/9148497
+* 编辑器的插件(高亮插件)
+ * http://blog.csdn.net/ichsonx/article/details/9148497
+#####Idea
+* Idea.Desktop
+ * 其中的Exec是启动的eclipse的路径
+ * Icon是图标所在的路径
 
-###5.git 配置
-
-看github教程
-
-生成密钥，同步
+```
+[Desktop Entry]
+Version=1.0
+Name=Idea
+Exec=/home/young/software/idea/idea-IC-135.1230/bin/idea.sh
+Terminal=false
+Icon=/home/young/software/idea/idea-IC-135.1230/bin/idea.png
+Type=Application
+Categories=Development;
+```
 
 ###6.安装Racket
-编译查看src/READEME
-安装好，快捷方式share/appliction，修改图标和程序路径(变成绝对路径)
+* 编译查看src/READEME
+* 安装好，快捷方式share/appliction，修改图标和程序路径(变成绝对路径)
+
+###7.git 配置
+
+* 输入密钥对时修改默认命名方便管理
+ * ~/.ssh/id_rsa_github
+
+###8.自动登陆服务器配置
+* 输入密钥对时修改默认命名方便管理
+ * ~/.ssh/id_rsa_server1
+
+```
+ssh-keygen -t rsa
+输入文件名~/.ssh/id_rsa_server1
+ssh-copy-id -i ~/.ssh/id_rsa_server1.pub username@server1
+```
+
+###9.多个ssh-key的管理
+* 编辑~/.ssh/config
+
+```
+# github
+Host github.com
+    HostName github.com
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_github
+# xxx的gitlab 
+Host gitlab.xxx.com
+    HostName xxx.com
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_xxx
+# server1 
+Host server1 
+    HostName server1
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_server1
+```

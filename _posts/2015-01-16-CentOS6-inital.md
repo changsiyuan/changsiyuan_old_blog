@@ -14,8 +14,9 @@ tags : [CentOS]
 ###1.中文输入法
 
 ```
-yum install ibus-pinyin
+im-chooser
 ```
+然后use ibus,选择chinese 中得pinyin ，add就可以了
 
 ###2.第三方源
 #####epel
@@ -31,8 +32,16 @@ rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noar
 yum install ntfs-3g
 ```
 ###4.chrome
+* 自动安装脚本
+ * http://chrome.richardlloyd.org.uk/install_chrome.sh
+* 然后使用gedit编辑install—chrome.sh，使用find功能查找并将其中的
+ * http://omahaproxy.appspot.com 改为https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm。
+* 打开终端，依次执行
 
-http://chrome.richardlloyd.org.uk/
+```
+chmod +x install_chrome.sh
+./install_chrome.sh
+```
 
 ###5.中文支持
 
@@ -77,9 +86,23 @@ yum install transmission
 ```
 yum update
 yum install kernel-devel
-yum groupinstall 'Development Tool'
+yum groupinstall 'Development Tools'
 ```
-###2.virtualbox(XP)（可能需要内核开发包）
+###2.virtualbox(XP)
+* 如果无法启动虚拟机，需要重新编译vbox的内核模块
+* 如果安装的时候安装了开发环境，那么kernel-devel和kernel-headers不需要安装了
+
+```
+/etc/init.d/vboxdrv setup
+```
+* 如果没有安装，下面安装的kernel-devel和当前内核不一定匹配
+* 最好升级一下内核，然后从最新得内核中启动，再安装
+
+```
+yum install kernel kernel-devel kernel-headers
+从最新内核重启
+/etc/init.d/vboxdrv setup
+```
 ###3.vim 插件
 neocomplcache和tagslist
 ###4.eclipse
@@ -88,6 +111,35 @@ http://blog.csdn.net/ichsonx/article/details/9148497
 
 ###5.git 配置
 
-看github教程
+* 输入密钥对时修改默认命名方便管理
+ * ~/.ssh/id_rsa_github
 
-生成密钥，同步
+###6.自动登陆服务器配置
+* 输入密钥对时修改默认命名方便管理
+ * ~/.ssh/id_rsa_server1
+
+```
+ssh-keygen -t rsa
+输入文件名~/.ssh/id_rsa_server1
+ssh-copy-id -i ~/.ssh/id_rsa_server1.pub username@server1
+```
+
+###7.多个ssh-key的管理
+* 编辑~/.ssh/config
+
+```
+# github
+Host github.com
+    HostName github.com
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_github
+# xxx的gitlab 
+Host gitlab.xxx.com
+    HostName xxx.com
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_xxx
+# server1 
+Host server1 
+    HostName server1
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_server1
