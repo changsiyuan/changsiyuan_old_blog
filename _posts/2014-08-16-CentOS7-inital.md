@@ -15,6 +15,7 @@ tags : [CentOS]
 * 选择Gnome Desktop后，把开发环境也勾选上，这样可以方便编译一些软件。
 * 安装完成之后可能没有windows的引导
  * 将以下代码添加进/etc/grub.d/40_custom
+
 ```
 menuentry "Windows"{
     set root=(hd0,1)
@@ -172,6 +173,7 @@ echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk' >> ~/.bashrc
 * 将下面的内容写入文本，命名为Eclipse.desktop
  * 其中的Exec是启动的eclipse的路径
  * Icon是图标所在的路径
+
 ```
 [Desktop Entry]
 Version=1.0

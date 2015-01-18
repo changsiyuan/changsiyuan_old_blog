@@ -33,9 +33,18 @@ yum install ntfs-3g
 ```
 ###4.chrome
 * 自动安装脚本
- * http://chrome.richardlloyd.org.uk/install_chrome.sh
-* 然后使用gedit编辑install—chrome.sh，使用find功能查找并将其中的
- * http://omahaproxy.appspot.com 改为https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm。
+
+```
+ http://chrome.richardlloyd.org.uk/install_chrome.sh
+```
+* 然后使用gedit编辑install—chrome.sh
+
+```
+用find功能查找并将其中的
+http://omahaproxy.appspot.com
+改为
+https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm。
+```
 * 打开终端，依次执行
 
 ```
@@ -77,7 +86,6 @@ yum install gstreamer-plugins-bad gstreamer-ffmpeg gstreamer-plugins-ugly -y
 ```
 yum install transmission
 ```
-
 
 ***
 ##开发环境
@@ -143,3 +151,4 @@ Host server1
     HostName server1
     PreferredAuthentications publickey
     IdentityFile ~/.ssh/id_rsa_server1
+```
