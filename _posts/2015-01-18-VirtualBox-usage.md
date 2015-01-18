@@ -75,7 +75,9 @@ sudo rm -f /EMPTY
 VBoxManage modifyhd mydisk.vdi --compact
 ```
 
-####4.Cannot register the hard disk，because a hard already exists
+***
+##4.Cannot register the hard disk，because a hard already exists
+***
 
 * 重新指定一个UUID就可以了
 
