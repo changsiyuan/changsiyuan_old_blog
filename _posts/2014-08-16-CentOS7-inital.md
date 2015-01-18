@@ -22,7 +22,8 @@ menuentry "Windows"{
     chainloader +1
 }
 ```
- * 然后更新引导
+* 然后更新引导
+
 ```
 grub2-mkconfig -o /boot/grub2/grub.cfg
 ```
@@ -40,7 +41,7 @@ http://fedoraproject.org/wiki/EPEL/FAQ#howtouse
 #####epel
 
 ```
-rpm -Uvh http://dl.fedoraproject.org/pub/epel/beta/7/x86_64/epel-release-7-0.2.noarch.rpm
+rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 ```
 
 #####nux-desktop
