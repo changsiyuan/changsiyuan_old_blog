@@ -185,44 +185,6 @@ Icon=/home/young/software/idea/idea-IC-135.1230/bin/idea.png
 Type=Application
 Categories=Development;
 ```
-
-
-###5.git 配置
-
-* 输入密钥对时修改默认命名方便管理
- * ~/.ssh/id_rsa_github
-
-###6.自动登陆服务器配置
-* 输入密钥对时修改默认命名方便管理
- * ~/.ssh/id_rsa_server1
-
-```
-ssh-keygen -t rsa
-输入文件名~/.ssh/id_rsa_server1
-ssh-copy-id -i ~/.ssh/id_rsa_server1.pub username@server1
-```
-
-###7.多个ssh-key的管理
-* 编辑~/.ssh/config
-
-```
-# github
-Host github.com
-    HostName github.com
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_github
-# xxx的gitlab 
-Host gitlab.xxx.com
-    HostName xxx.com
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_xxx
-# server1 
-Host server1 
-    HostName server1
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_server1
-```
-
-###8.安装Racket
+###5.安装Racket
 * 编译查看src/READEME
 * 安装好，快捷方式share/appliction，修改图标和程序路径(变成绝对路径)

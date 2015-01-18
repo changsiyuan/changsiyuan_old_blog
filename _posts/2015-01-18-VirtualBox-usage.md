@@ -1,9 +1,9 @@
 ---
 layout : post
-title : CentOS 6 日常使用配置
+title : VirtualBox 的使用
 category : other
 tagline : "Supporting tagline"
-tags : [CentOS]
+tags : [VirtualBox]
 ---
 {% include JB/setup %}
 

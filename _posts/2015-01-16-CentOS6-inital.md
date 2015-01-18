@@ -99,39 +99,3 @@ neocomplcache和tagslist
 ###3.eclipse
 #####编辑器的插件(高亮插件)
 http://blog.csdn.net/ichsonx/article/details/9148497
-
-###4.git 配置
-
-* 输入密钥对时修改默认命名方便管理
- * ~/.ssh/id_rsa_github
-
-###5.自动登陆服务器配置
-* 输入密钥对时修改默认命名方便管理
- * ~/.ssh/id_rsa_server1
-
-```
-ssh-keygen -t rsa
-输入文件名~/.ssh/id_rsa_server1
-ssh-copy-id -i ~/.ssh/id_rsa_server1.pub username@server1
-```
-
-###6.多个ssh-key的管理
-* 编辑~/.ssh/config
-
-```
-# github
-Host github.com
-    HostName github.com
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_github
-# xxx的gitlab 
-Host gitlab.xxx.com
-    HostName xxx.com
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_xxx
-# server1 
-Host server1 
-    HostName server1
-    PreferredAuthentications publickey
-    IdentityFile ~/.ssh/id_rsa_server1
-```
