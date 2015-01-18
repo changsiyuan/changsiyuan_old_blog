@@ -92,37 +92,20 @@ yum install transmission
 ***
 ###1.开发的依赖
 ```
-yum update
-yum install kernel-devel
 yum groupinstall 'Development Tools'
 ```
-###2.virtualbox(XP)
-* 如果无法启动虚拟机，需要重新编译vbox的内核模块
-* 如果安装的时候安装了开发环境，那么kernel-devel和kernel-headers不需要安装了
-
-```
-/etc/init.d/vboxdrv setup
-```
-* 如果没有安装，下面安装的kernel-devel和当前内核不一定匹配
-* 最好升级一下内核，然后从最新得内核中启动，再安装
-
-```
-yum install kernel kernel-devel kernel-headers
-从最新内核重启
-/etc/init.d/vboxdrv setup
-```
-###3.vim 插件
+###2.vim 插件
 neocomplcache和tagslist
-###4.eclipse
+###3.eclipse
 #####编辑器的插件(高亮插件)
 http://blog.csdn.net/ichsonx/article/details/9148497
 
-###5.git 配置
+###4.git 配置
 
 * 输入密钥对时修改默认命名方便管理
  * ~/.ssh/id_rsa_github
 
-###6.自动登陆服务器配置
+###5.自动登陆服务器配置
 * 输入密钥对时修改默认命名方便管理
  * ~/.ssh/id_rsa_server1
 
@@ -132,7 +115,7 @@ ssh-keygen -t rsa
 ssh-copy-id -i ~/.ssh/id_rsa_server1.pub username@server1
 ```
 
-###7.多个ssh-key的管理
+###6.多个ssh-key的管理
 * 编辑~/.ssh/config
 
 ```
