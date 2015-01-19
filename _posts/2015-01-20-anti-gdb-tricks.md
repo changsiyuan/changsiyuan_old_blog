@@ -1,3 +1,12 @@
+---
+layout : post
+title : 反GDB调试
+category : other
+tagline : "Supporting tagline"
+tags : [Git]
+---
+{% include JB/setup %}
+
 ## 1. 文件描述符
 
 * 因为GDB等调试器会打开出了0、1、2之外的文件描述符
