@@ -3,7 +3,7 @@ layout : post
 title : 反GDB调试
 category : other
 tagline : "Supporting tagline"
-tags : [Git]
+tags : [GDB]
 ---
 {% include JB/setup %}
 
