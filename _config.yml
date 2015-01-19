@@ -6,7 +6,8 @@ permalink: /:categories/:year/:month/:day/:title
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 auto: true
 pygments: true
-markdown: rdiscount
+markdown: remarkable
+#markdown: rdiscount
 #markdown: redcarpet
 
 #for myself
