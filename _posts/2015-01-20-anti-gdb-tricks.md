@@ -180,7 +180,9 @@ int main(int argc, const char *argv[])
    
    构建自己的动态库用来代替实际用的动态库
    
+
 第一步
+
 ```
 // -- ptrace.c --
 int ptrace(int i, int j, int k, int l)
@@ -189,7 +191,9 @@ printf(" PTRACE CALLED!\n");
 }
 // -- EOF --
 ```
+
 第二步
+
 ```
 $ gcc -shared ptrace.c -o ptrace.so
 $  gdb ./antiptrace
