@@ -78,7 +78,8 @@ $ blkid
 $ ln -s /mnt/data ~/data
 ```
 
-* 修改/etc/fstab
+* 将下面内容添加到/etc/fstab
+* 注意修改UUID和路径
 
 ```
 UUID=8db1afdd-53eb-4a87-b975-17d599fe5e8c /mnt/data               ext4    defaults        0 0
@@ -91,6 +92,10 @@ UUID=8db1afdd-53eb-4a87-b975-17d599fe5e8c /mnt/data               ext4    defaul
 # mkdir /mnt/WinD
 $ ln -s /mnt/WinD ~/WinD
 ```
+
+* 将下面内容添加到/etc/fstab
+* 注意修改UUID和路径
+
 ```
 UUUID="EE909F16909EE47D  /mnt/WinD          ntfs-3g    defaults        0 0
 ```
@@ -134,9 +139,9 @@ gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8','CUR
 yum install audacious audacious-plugins-freeworld
 ```
 
-#### 7. vlc
+#### 7. 视频播放器VLC
 
-##### 安装vlc
+##### 安装 VLC
 
 ```
 yum install vlc
@@ -177,14 +182,28 @@ yum install gimp
 ```
 yum install transmission
 ```
-####11.共享文件
+#### 11. 共享文件
 * 如果需要共享~/Documents中的文件
 
 ```
 cd ~/Documents
 python -m SimpleHTTPServer 8080
+firewall-cmd --permanent --zone=public --add-port=8080/tcp
 ```
 * 别人在浏览器中访问这个server就可以获取目录下的文件
+
+#### 12. 使用NoMachine进行远程桌面连接
+* NoMachine既可以在Windows上使用，也可以在Linux上使用
+
+```
+需要epel和nux-desktop
+yum -y install xrdp tigervnc-server
+systemctl start xrdp.service
+netstat -antup | grep xrdp
+systemctl enable xrdp.service
+firewall-cmd --permanent --zone=public --add-port=3389/tcp
+firewall-cmd --reload
+```
 
 ***
 ## 开发环境
