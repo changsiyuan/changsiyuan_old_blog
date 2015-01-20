@@ -24,7 +24,7 @@ menuentry "Windows"{
 ```
 * 然后更新引导
 
-```
+```sh
 grub2-mkconfig -o /boot/grub2/grub.cfg
 ```
 
@@ -41,23 +41,23 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 ##### epel
 
-```
+```sh
 rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 ```
 
 * 如果上面的命令不能使用，去下面的网页看最新的命令
 
-```
+```sh
 http://fedoraproject.org/wiki/EPEL/FAQ#howtouse
 ```
 
 ##### nux-desktop
 
-```
+```sh
 rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
 ```
 #### 3. ntfs
-```
+```sh
 需要epel
 yum install ntfs-3g
 ```
@@ -65,7 +65,7 @@ yum install ntfs-3g
 
 * 通过blkid可以看到每个分区的UUID
 
-```
+```sh
 $ blkid
 /dev/sda6: UUID="EE909F16909EE47D" TYPE="ntfs" 
 /dev/sda7: UUID="8db1afdd-53eb-4a87-b975-17d599fe5e8c" TYPE="ext4"
@@ -73,7 +73,7 @@ $ blkid
 
 * 如果要将/dev/sda7作为数据盘，希望能够自动挂载 
 
-```
+```sh
 # mkdir /mnt/data
 $ ln -s /mnt/data ~/data
 ```
@@ -88,7 +88,7 @@ UUID=8db1afdd-53eb-4a87-b975-17d599fe5e8c /mnt/data               ext4    defaul
 * 如果要挂载ntfs的分区也是类似的
 * 以/dev/sda6为例
 
-```
+```sh
 # mkdir /mnt/WinD
 $ ln -s /mnt/WinD ~/WinD
 ```
@@ -104,10 +104,6 @@ UUUID="EE909F16909EE47D  /mnt/WinD          ntfs-3g    defaults        0 0
 * 如果ntfs的盘无法手动挂载，进入Windows8,**重启**（不是关机）
 * 如果设置了ntfs的盘自动挂载后，CentOS无法正常启动，进入Windows8，**重启**(不要关机)
 * Windows8关机并不会完全关机，这时CentOS自动挂载ntfs的分区，就会出现无法启动的异常
-
-#### 4. chrome
-
-官网下载
 
 #### 5. 中文支持
 
@@ -132,18 +128,22 @@ set fencs=utf-8,gbk
 gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8','CURRENT','GB18030','ISO-8859-15','UTF-16']"
 ```
 
-#### 6. 音乐播放器audacious
+#### 6. chrome
 
-```
+官网下载
+
+#### 7. 音乐播放器audacious
+
+```sh
 需要nux-desktop
 yum install audacious audacious-plugins-freeworld
 ```
 
-#### 7. 视频播放器VLC
+#### 8. 视频播放器VLC
 
 ##### 安装 VLC
 
-```
+```sh
 yum install vlc
 yum remove totem
 ```
@@ -154,48 +154,48 @@ yum remove totem
 *  接着点开：输入／编码－其它编码器－字幕 右侧的 字幕文本编码 选 GB18030
 *  然后 把 自动检测 UTF－8  和字幕 格式化字幕 前面的勾去掉
 
-#### 8. WPS的安装
+#### 9. WPS的安装
 * 从WPS的官网下载**alpha版本**安装包wps-office-9.1.0.4945-1.a16p3.i686.rpm
 * 使用yum install,不要使用rpm -ivh
 
-```
+```sh
 yum install wps-office-9.1.0.4945-1.a16p3.i686.rpm
 ```
 
 * 安装之后还有公式的字体问题下载symbol－fonts_all.deb
 * 解压之后可以找到字体，将这些字体复制到~/.fonts中(如果没有该文件夹，就新建一个)
 
-```
+```sh
 cd ~/.fonts
 mkfontscale
 mkfontdir
 fc-cache
 ```
 
-#### 9. 画图软件gimp
+#### 10. 画图软件gimp
 
-```
+```sh
 yum install gimp
 ```
-#### 10. BT软件
+#### 11. BT软件
 
-```
+```sh
 yum install transmission
 ```
-#### 11. 共享文件
+#### 12. 共享文件
 * 如果需要共享~/Documents中的文件
 
-```
+```sh
 cd ~/Documents
 python -m SimpleHTTPServer 8080
 firewall-cmd --permanent --zone=public --add-port=8080/tcp
 ```
 * 别人在浏览器中访问这个server就可以获取目录下的文件
 
-#### 12. 使用NoMachine进行远程桌面连接
+#### 13. 使用NoMachine进行远程桌面连接
 * NoMachine既可以在Windows上使用，也可以在Linux上使用
 
-```
+```sh
 需要epel和nux-desktop
 yum -y install xrdp tigervnc-server
 systemctl start xrdp.service
@@ -209,7 +209,7 @@ firewall-cmd --reload
 ## 开发环境
 ***
 #### 1. 开发的依赖
-```
+```sh
 yum groupinstall 'Development Tools'
 ```
 
@@ -217,7 +217,7 @@ yum groupinstall 'Development Tools'
 neocomplcache和tagslist
 #### 3. Java开发环境配置
 
-```
+```sh
 yum install java-1.7.0-openjdk
 yum install java-1.7.0-openjdk-devel
 echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk' >> ~/.bashrc
@@ -263,7 +263,7 @@ Categories=Development;
 #### 5. 安装R和RStudio
 * R
 
-```
+```sh
 yum install R
 ```
 * R Studio
