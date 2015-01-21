@@ -71,6 +71,16 @@ IFile中Writer的append方法：
 * (ReduceTask中COPY Phase)InMemFSMergeThread和LocalFSMerger
 * (ReduceTask中SORT Phase)createKVIterator
 
+***
+###Merge的执行条件
+***
+* TODO
+
+***
+###Merge时文件个数的变化
+***
+* TODO
+
 #####（MapTask）将溢写文件合并
 ![Merge合并硬盘中的文件](/_image/5.1.Merge.png)
 * 图中只画了数据文件的合并，当然数据文件也是合并的
