@@ -70,7 +70,7 @@ yum install ntfs-3g
 /dev/sda6: UUID="EE909F16909EE47D" TYPE="ntfs" 
 /dev/sda7: UUID="8db1afdd-53eb-4a87-b975-17d599fe5e8c" TYPE="ext4"
 ```
-
+##### 挂载ext4等分区
 * 如果要将/dev/sda7作为数据盘，希望能够自动挂载 
 
 ```sh
@@ -85,6 +85,8 @@ $ ln -s /mnt/data ~/data
 UUID=8db1afdd-53eb-4a87-b975-17d599fe5e8c /mnt/data               ext4    defaults        0 0
 ```
 
+##### 挂载ntfs等分区
+
 * 如果要挂载ntfs的分区也是类似的
 * 以/dev/sda6为例
 
@@ -94,7 +96,7 @@ $ ln -s /mnt/WinD ~/WinD
 ```
 
 * 将下面内容添加到/etc/fstab
-* 注意修改UUID和路径
+* **注意修改UUID和路径**
 
 ```
 UUUID="EE909F16909EE47D  /mnt/WinD          ntfs-3g    defaults        0 0
