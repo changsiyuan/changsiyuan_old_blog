@@ -66,7 +66,7 @@ yum install ntfs-3g
 * 通过blkid可以看到每个分区的UUID
 
 ```sh
-$ blkid
+# blkid
 /dev/sda6: UUID="EE909F16909EE47D" TYPE="ntfs" 
 /dev/sda7: UUID="8db1afdd-53eb-4a87-b975-17d599fe5e8c" TYPE="ext4"
 ```
@@ -79,7 +79,7 @@ $ ln -s /mnt/data ~/data
 ```
 
 * 将下面内容添加到/etc/fstab
-* 注意修改UUID和路径
+* **注意修改UUID和路径**
 
 ```
 UUID=8db1afdd-53eb-4a87-b975-17d599fe5e8c /mnt/data               ext4    defaults        0 0
@@ -100,10 +100,12 @@ $ ln -s /mnt/WinD ~/WinD
 UUUID="EE909F16909EE47D  /mnt/WinD          ntfs-3g    defaults        0 0
 ```
 
+* **注意**
 * 如果是使用**Windows8+CentOS双系统**的话，请注意Windows8不要使用关机，要使用重启
+* Windows8关机并不会完全关机，这时CentOS自动挂载ntfs的分区，就会出现无法启动的异常
+* **这种情况下出现的问题**
 * 如果ntfs的盘无法手动挂载，进入Windows8,**重启**（不是关机）
 * 如果设置了ntfs的盘自动挂载后，CentOS无法正常启动，进入Windows8，**重启**(不要关机)
-* Windows8关机并不会完全关机，这时CentOS自动挂载ntfs的分区，就会出现无法启动的异常
 
 #### 5. 中文支持
 
