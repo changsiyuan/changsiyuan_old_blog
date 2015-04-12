@@ -9,6 +9,7 @@ tags : [MapReduce]
 
 ## 引言
 以往也看过一些对于MapReduce框架的通俗解释，例如
+
 * [Hadoop的MapReduce实现原理解释](http://blog.csdn.net/fullofwindandsnow/article/details/7258667)
 * [我是如何向老婆解释MapReduce的？](http://blog.jobbole.com/1321/)
 
@@ -17,7 +18,8 @@ tags : [MapReduce]
 ## 第一部分：点餐与并行
 
 让我们来想象一下，在一个熙熙攘攘的小餐馆有很多的顾客。每桌的都有一个服务员在热情的招待着顾客。服务员依次问每个客户需要什么。西红柿炒蛋，红烧肉人人都爱。然后服务员把订单交给厨房。每个大厨把自己负责的菜都烧好。在多个大厨的精心烹饪下，一桌美味很快出炉。当然这些美味也很快就消失在人们欢乐的笑声中。
-![点餐的流程](/_image/mapreduce_introduction_1.jpg)
+
+![点餐的流程](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_1.jpg)
 
 
 这种熟悉的场景，很自然的蕴含了分布式在里面。比如说，多个服务员同时可以招待很多客人，多个大厨同时做不同的菜。这个确实没有什么奇怪，如果不这样做反而奇怪。
@@ -38,17 +40,23 @@ mapper使用map来处理每个kv。map就是只和一个KV有关的操作，它�
 map值和一个KV有关，也就意味着如果输出和多个KV有关的话，那么map就是无能为力了。比如说，餐馆中一共有多少客人，这显然不是和一个客人有关。一个文本有多少多少行，显然也不是只和一行有关。这个时候，就需要其他的办法了，其实就是下面的介绍的combine和reduce。
 
 当然，这里还有一个问题，就是你肯定不会拿到像下面这样的订单，每个菜色没有汇总。
-![没有汇总](/_image/mapreduce_introduction_2.jpg)
+
+![没有汇总](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_2.jpg)
+
 当然也不会是这样，直接就是全部的所有人的汇总订单
-![全部汇总](/_image/mapreduce_introduction_3.jpg)
+
+![全部汇总](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_3.jpg)
+
 每桌的订单，应该是经过简单汇总的
-![1号订单](/_image/mapreduce_introduction_4.jpg)
+
+![1号订单](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_4.jpg)
 
 上面说过map只和一个KV有关，那么如何完成上述的和多个KV有关的合并操作呢？那就是combine。combine和reduce的不同之处在于，combine拥有的的只是每个mapper处理完成之后的数据，而reduce则是处理所有相关的数据。就是说，这里的订单仅仅是这一桌客人点的菜进行了一些简单的汇总，而不是所有顾客订单的汇总。
 
-顾客的订单被服务员收集上来，但是呢，厨师之间的分工明确，每个厨师负责几个菜色。相同的菜如果有两个大厨做，容易有很多问题，所以还是分工明确比较好。菜色和数量在订单上是按照桌子排列的，菜色在厨师则是按照类别分的。把每桌订单上的某类菜的数量告诉相应的大厨，这是一个相当混乱的过程。相当于是下面的这个样子。
-还可以继续看看我们第一张图
-![点餐的流程](/_image/mapreduce_introduction_1.jpg)
+顾客的订单被服务员收集上来，但是呢，厨师之间的分工明确，每个厨师负责几个菜色。相同的菜如果有两个大厨做，容易有很多问题，所以还是分工明确比较好。菜色和数量在订单上是按照桌子排列的，菜色在厨师则是按照类别分的。把每桌订单上的某类菜的数量告诉相应的大厨，这是一个相当混乱的过程。相当于是下面的这个样子。还可以继续看看我们第一张图，统计每种菜色还是很复杂的。
+
+![点餐的流程](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_1.jpg)
+
 这个就是shuffle的过程。那么如何确定那类菜到底给那个厨师呢？每个大厨并不是只做一种菜（真这样的话，小餐馆可以关门了），而是同一个大厨要做好多种菜，那么，我们需要根据菜色，决定出给那个大厨。
 
 |           餐馆                     |         处理数据                   |
@@ -70,7 +78,8 @@ reducer使用reduce处理每个key和相应的全部value，也就是说，每�
 
 ## 第三部分：深究mapreduce
 多个大厨们精心烹饪，各种美味菜色新鲜出炉，服务员按照之前的订单组合各种美味。这是我引言中提到的一个场景。那么根据订单组合菜色，算是shuffle吗。是的，shuffle是数据从一个维度的聚合变成另外一个维度的聚合。
-![shuffle的本质](/_image/mapreduce_introduction_5.jpg)
+
+![shuffle的本质](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_5.jpg)
 
 正像图中那样，订单是一个维度，菜色是另一个维度。我们把订单按照菜色统计，这是shuffle。大厨做完菜之后，按照订单分拣，这是shuffle。
 
