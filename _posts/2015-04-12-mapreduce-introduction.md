@@ -58,7 +58,7 @@ map值和一个KV有关，也就意味着如果输出和多个KV有关的话，�
 
 顾客的订单被服务员收集上来，但是呢，大厨之间的分工明确，每个大厨负责几个菜色。相同的菜如果有两个大厨做，容易有很多问题，所以还是分工明确比较好。菜色和数量在订单上是按照桌子排列的，菜色在大厨则是按照类别分的。把每桌订单上的某类菜的数量告诉相应的大厨，这是一个相当混乱的过程。相当于是下面的这个样子。还可以继续看看我们第一张图，统计每种菜色还是很复杂的。
 
-![点餐的流程](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_1.jpg)
+![shuffle](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_5.jpg)
 
 这个就是shuffle的过程。那么如何确定那类菜到底给那个大厨呢？每个大厨并不是只做一种菜（真这样的话，小餐馆可以关门了），而是同一个大厨要做好多种菜，那么，我们需要根据菜色，决定把订的数量告诉哪个大厨。
 
@@ -86,7 +86,7 @@ reducer使用reduce处理每个Key和相应的全部Value。也就是说，每�
 
 订单的统计是一次MapReduce的过程，而把做好的饭菜按照订单打包不过是另一个shuffle的过程。很多饭菜流水线式的生产出来，服务员把饭菜按照订单分拣，就是一次完美的shuffle过程。如果认真思考整个做饭的过程，这个是先把各种蔬菜reduce成一个一个不同种类的菜的过程，然后按照订单分拣是一次shuffle，最后把饭菜送出去就是一个简单的map过程。很前面的订单统计完全反转的一个过程。
 
-![shuffle的本质](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_5.jpg)
+![shuffle的本质](https://raw.githubusercontent.com/inotepad/inotepad.github.io/master/_image/mapreduce_introduction_6.jpg)
 
 正像图中那样，订单是一个维度，菜色是另一个维度。我们把订单按照菜色统计，这是shuffle。
 
