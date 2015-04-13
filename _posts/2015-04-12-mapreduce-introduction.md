@@ -14,6 +14,7 @@ tags : [MapReduce]
 * [Hadoop的MapReduce实现原理解释](http://blog.csdn.net/fullofwindandsnow/article/details/7258667)
 * [我是如何向老婆解释MapReduce的？](http://blog.jobbole.com/1321/)
 
+
   但是，总是感觉这些例子比较生硬。这些例子都需要自己有分布式的意识，而不是说这本身就是分布式在执行了。前几天，我在快餐店慢悠悠吃着饭，看着好多饭菜都整齐的摞在一起，服务员熟练的按照订单把各种饭菜打包成一个外卖。我猛然发现，我好像明白了Shuffle的本质。
 
 ## 第一部分：点餐与并行
