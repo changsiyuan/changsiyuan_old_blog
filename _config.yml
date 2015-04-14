@@ -81,7 +81,7 @@ JB :
   comments :
     provider : duoshuo
     duoshuo :
-      name : poised-flw
+      name : 
     disqus :
       short_name : jekyllbootstrap
     livefyre :
