@@ -7,7 +7,9 @@ tags : [computer]
 ---
 {% include JB/setup %}
 
-## 计算机开机过程详解
+### 引言
+- 计算机开机过程似乎是个非常复杂的过程，本文为您梳理出计算机开机最重要的若干阶段，让您对计算机开机过程一目了然；
+- 参考资料：[计算机是如何启动的](http://www.ruanyifeng.com/blog/2013/02/booting.html)
 
 ### 第一阶段：BIOS
 - 按下开机键，读取ROM内容；
@@ -16,6 +18,8 @@ tags : [computer]
 
 ### 第二阶段：主引导记录
 - 磁盘逻辑结构见下图：
+
+!(https://github.com/changsiyuan/changsiyuan.github.io/blob/master/_image/disk.png)
 - 决定从硬盘启动；
 - 从硬盘的0号扇区读取主引导记录（master boot record，MBR）；
 - MBR结尾是分区表，告诉计算机每个分区的起始和终止地址；
