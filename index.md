@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Welcome to Siyuan Blog
+title: Welcome to Siyuan's Blog
 ---
 {% include JB/setup %}
 
