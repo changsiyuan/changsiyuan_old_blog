@@ -20,6 +20,7 @@ tags : [computer]
 - 磁盘逻辑结构见下图：
 
 ![disk](https://github.com/changsiyuan/changsiyuan.github.io/blob/master/_image/disk.png)
+
 - 决定从硬盘启动；
 - 从硬盘的0号扇区读取主引导记录（master boot record，MBR）；
 - MBR结尾是分区表，告诉计算机每个分区的起始和终止地址；
