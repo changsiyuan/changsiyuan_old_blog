@@ -19,3 +19,6 @@ tags : [Web]
 |框架名称|描述|优缺点|依赖|
 |---|---|---|---|
 |angularjs|免费；辅助JavaScript的网页开发框架；和ExtJS处于竞争地位；|灵活性高但是完备性中等；UI控件库不如ExtJS全面，但是可定制性强；不直接支持移动端；|由于没有全面的UI控件，一般用angularUI或者bootstrap进行页面布局和渲染；|
+|ExtJS|收费；辅助JavaScript的网页开发框架；和angularjs处于竞争地位；|完备性高但是灵活性中等；拥有非常全面的UI控件库，浏览器间可移植性极强，但是用户定制性稍差；直接支持移动端；||
+|jQueryUI|免费；|UI控件较为混乱；可定制性强；直接支持移动端；||
+|NEJ(Nice Easy Javascript)|网易前端开发框架；辅助JavaScript的网页开发框架；|||
