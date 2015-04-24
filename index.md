@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Welcome to inotepad
+title: Welcome to Siyuan Blog
 ---
 {% include JB/setup %}
 
