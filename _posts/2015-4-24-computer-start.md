@@ -1,6 +1,6 @@
 ---
 layout : post
-title : 通俗介绍MapReduce计算框架
+title : 计算机开机过程原理
 category : Hadoop
 tagline : "Supporting tagline"
 tags : [MapReduce]
