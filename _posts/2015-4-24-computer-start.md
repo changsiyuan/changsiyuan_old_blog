@@ -2,7 +2,7 @@
 layout : post
 title : 计算机开机过程详解
 category : Computer Harware
-tagline : "Supporting tagline"
+tagline : "author: ChangSiyuan"
 tags : [computer]
 ---
 {% include JB/setup %}
@@ -23,7 +23,7 @@ tags : [computer]
 
 - 决定从硬盘启动；
 - 从硬盘的0号扇区读取主引导记录（master boot record，MBR）；
-- MBR结尾是分区表，告诉计算机每个分区的起始和终止地址；
+- MBR结尾是分区表(上图)，告诉计算机每个分区的起始和终止地址；
 - 确定活动分区（装有操作系统的分区），读取这个分区的引导块（第一个块），执行它；
 - 引导块中的程序负责装载该分区的操作系统；
 - 操作系统启动，加载操作系统内核，启动任务管理器等；
