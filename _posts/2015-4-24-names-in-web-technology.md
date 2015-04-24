@@ -22,3 +22,10 @@ tags : [Web]
 |ExtJS|收费；辅助JavaScript的网页开发框架；和angularjs处于竞争地位；|完备性高但是灵活性中等；拥有非常全面的UI控件库，浏览器间可移植性极强，但是用户定制性稍差；直接支持移动端；||
 |jQueryUI|免费；|UI控件较为混乱；可定制性强；直接支持移动端；||
 |NEJ(Nice Easy Javascript)|网易前端开发框架；辅助JavaScript的网页开发框架；|||
+
+### 支持库对比
+|支持库名称|描述|优缺点|
+|---|---|---|
+|jQuery|纯粹的JavaScript代码库，目的是简化DOM操作|和prototype做的事情相同，方法不同，jQuery火了，prototype没有火起来；|
+|prototype|纯粹的JavaScript代码库，目的是简化DOM操作|没有jQuery火|
+|YUI(Yahoo! UI Library)|开放源代码的 JavaScript 函数库；||
