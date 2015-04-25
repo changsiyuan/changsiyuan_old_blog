@@ -7,6 +7,7 @@ tags : [git]
 ---
 {% include JB/setup %}
 
+
 ### 引言
 - gitlab是常用的版本管理工具。
 - 相对于github来说，gitlab不收费，而且基本具有github的全部功能，因此特别适合小微企业和学校实验室等用作版本管理工具。
