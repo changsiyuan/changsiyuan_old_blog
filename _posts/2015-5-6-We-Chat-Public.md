@@ -1,9 +1,9 @@
 ---
 layout : post
-title : 计算机开机过程详解
-category : Computer Harware
+title : 微信公众号制作技巧
+category : WeChat
 tagline : "author: ChangSiyuan"
-tags : [computer]
+tags : [publicity]
 ---
 {% include JB/setup %}
 
