@@ -39,4 +39,5 @@ tags : [Hadoop]
 | ------------- |:-------------:| 
 | 不执行reduce函数     | job.setNumReduceTasks(0);此时不执行reduce，输出文件的数量就是map的数量； | 
 | 设置执行map的类     | job.setMapperClass(FlowFilter.class);     |   
-| 设置执行combine的类（一般就是reduce类） | job.setCombinerClass(Reduce.class);      |    
+| 设置执行combine的类（一般就是reduce类） | job.setCombinerClass(Reduce.class);      |   
+|设置执行reduce的类|job.setReducerClass(DNTGUserInfoReducer.class);|
