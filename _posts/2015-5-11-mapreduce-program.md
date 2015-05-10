@@ -11,6 +11,7 @@ tags : [Hadoop]
 - 在编写Mapreduce程序的过程中会遇到各种各样的问题，本文为您梳理了常见的问题、注意事项和技巧；
 
 ### MapReduce中常见的数据类型转换方法
+
 | 类型转换        | 方法汇总           | 
 | ------------- |:-------------:|
 | int>String  | int i=12345; String s=""; 第一种方法：s=i+""; 第二种方法：s=String.valueOf(i);| 
@@ -33,8 +34,8 @@ tags : [Hadoop]
 - map的输入固定为<key=这一行的输入在分片文件中的偏移量，value=这一行内容>，输入类型为<object类型，Text类型>，这些都不能随意更改，如需更改，要重写inputFormat；
 
 ### Mapreduce程序参数设置
-| 参数       | 设置方法          | 
-| ------------- |:-------------:| 
+| 参数        | 设置方法           | 
+| ------------- |:-------------:|
 |不执行reduce函数|job.setNumReduceTasks(0);|
 |设置执行map的类|job.setMapperClass(FlowFilter.class);|
 |设置执行combine的类（一般就是reduce类）|job.setCombinerClass(Reduce.class);|
