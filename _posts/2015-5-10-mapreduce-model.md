@@ -616,4 +616,109 @@ public class WordCount {
 15700000000 5555
 ```
 
+### 去重计数（Distinct Counting）
+- 问题定义：在数据文件中包含大量的记录，每条记录中包含了某个实体的若干属性，目标问题是在计算某几个属性组合后去掉相同重复组合后，其中某一属性的统计值；
+- 具体问题的描述：输入为两列，手机号、访问网址，要求统计每个网址都有几种手机号访问；
+- 解决方案：map中将网址作为key、手机号作为value，发送给reduce；计数、去重的工作都由reduce完成；去重的工作由HashSet完成；
+- 程序：
 
+```
+package wordcount_test;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class WordCount {
+
+  public static class TokenizerMapper
+       extends Mapper<Object, Text, Text, LongWritable>{
+
+    private LongWritable phoneNum = new LongWritable();
+    private Text webPage = new Text();
+
+    public void map(Object key, Text value, Context context
+                    ) throws IOException, InterruptedException {
+    	String line = value.toString();
+		String[] array = line.split(" ");
+		if(array.length==2){
+			phoneNum = new LongWritable(Long.parseLong(array[0]));
+			webPage = new Text(array[1]);
+			context.write(webPage, phoneNum);
+		}else{
+			return;
+		}
+    }
+  }
+
+  public static class IntSumReducer
+       extends Reducer<Text,LongWritable, Text, IntWritable> {
+
+	private IntWritable result = new IntWritable();
+	
+    public void reduce(Text key, Iterable<LongWritable> values,
+                       Context context
+                       ) throws IOException, InterruptedException {
+
+      int sum = 0;
+      Set <String> phoneNumSet = new HashSet<String>(); 
+      for(LongWritable val : values){
+    	  phoneNumSet.add(val.toString());
+      }
+      for(String s : phoneNumSet){
+    	  sum++;
+      }
+      result.set(sum);
+      context.write(key, result);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration();
+    Job job = Job.getInstance(conf, "word count");
+    job.setJarByClass(WordCount.class);
+    job.setMapperClass(TokenizerMapper.class);
+//    job.setCombinerClass(IntSumReducer.class);
+    job.setReducerClass(IntSumReducer.class);
+    
+    job.setNumReduceTasks(1);
+    job.setMapOutputKeyClass(Text.class);
+    job.setMapOutputValueClass(LongWritable.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+    FileInputFormat.addInputPath(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+  }
+}
+```
+
+- 示例输入输出：
+
+```
+输入：手机号、访问网址，用空格分割
+15700000000 qq.com
+13900000000 qq.com
+13900000000 sina.com
+15700000000 qq.com
+15700000000 sina.com
+12900000000 sina.com
+
+输出：每个网址对应的手机号种类数量
+qq.com 2
+sina.com 3
+```
