@@ -35,11 +35,20 @@ tags : [Hadoop]
 
 ### Mapreduce程序参数设置
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
+| Tables        | Are           | 
+| ------------- |:-------------:| 
 | 不执行reduce函数     | job.setNumReduceTasks(0); | 
 | 设置执行map的类      | job.setMapperClass(FlowFilter.class);      |   
 | 设置执行combine的类（一般就是reduce类）| job.setCombinerClass(Reduce.class);     |  
+| 设置执行reduce的类 | job.setReducerClass(DNTGUserInfoReducer.class); |
+|设置map的数量|job.setNumMapTasks(maps)；|
+|设置reduce数量（最终输出文件数量）|job.setNumReduceTasks(reduces);|
+|设置文件输入类型（默认为inputFormat，一行一行读取）|job.setInputFormatClass(ProvinceInputFormat.class); |
+|设置map的输出类型（key、value类型）|job.setMapOutputKeyClass(HMKey.class); job.setMapOutputValueClass(HMValue.class);|  
+|设置redcue的输出类型（key、value类型）|job.setReduceOutputKeyClass(Text.class); job.setReduceOutputValueClass(IntWritable.class);|
+|统一设置map和reduce的输出类型|job.setOutputKeyClass(Text.class); 
+job.setOutputValueClass(IntWritable.class);|
+|设置整个程序输入、输出路径|FileInputFormat.addInputPath(job, new Path(otherArgs[0])); FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));|
 
 
 | 参数        | 设置方法           | 
