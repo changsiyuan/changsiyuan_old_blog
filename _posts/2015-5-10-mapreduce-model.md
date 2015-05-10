@@ -354,4 +354,6 @@ souhu.com 18500000002
 souhu.com 18500000005
 ```
 
+- 说明：本程序并不能实现将每一个网址放入单独的文件输出，这是因为在“shuffle”过程中，计算出的partitionID相同的key被分到一个reduce中，然而，不同的key的partitionID可能相同，即同一个key肯定被分到同一个reduce，但是同一个reduce中可能有不同的key，所以上述算法不能实现完全分类。关于shuffle请参考我的另一篇博客[Mapreduce过程详解](http://changsiyuan.github.io/hadoop/2015/04/01/mapreduce/)
+
 
