@@ -29,3 +29,5 @@ tags : [Hadoop]
 - reduce中遍历values的过程只能执行一遍，因为values是Iterable迭代器类型；如果需要多次遍历values内容，要么每次遍历前移动迭代器指针到初始位置，要么第一次遍历时将values内容放入list中，方便以后重复访问；
 
 - map的输出必须是Writable类型的（比如IntWritable、LongWritable、Text），如果是普通java类型（Integer、Long、String）会出错（报错：Unable to initialize MapOutputCollector）；
+
+- map的输入固定为<key=这一行的输入在分片文件中的偏移量，value=这一行内容>，输入类型为<object类型，Text类型>，这些都不能随意更改，如需更改，要重写inputFormat；
