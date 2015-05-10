@@ -35,6 +35,13 @@ tags : [Hadoop]
 
 ### Mapreduce程序参数设置
 
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+
 | 参数        | 设置方法           | 
 | ------------- |:-------------:|
 |不执行reduce函数 |job.setNumReduceTasks(0); |
@@ -49,3 +56,4 @@ tags : [Hadoop]
 |统一设置map和reduce的输出类型|job.setOutputKeyClass(Text.class); 
 job.setOutputValueClass(IntWritable.class);|
 |设置整个程序输入、输出路径|FileInputFormat.addInputPath(job, new Path(otherArgs[0])); FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));|
+
