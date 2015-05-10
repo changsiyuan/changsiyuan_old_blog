@@ -232,3 +232,126 @@ public class WordCount {
 13800000000 35
 18700000000 20
 ```
+
+### 分类（classfication）
+- 问题定义：在数据文件中包含大量的记录，每条记录中包含了某个实体的若干属性，目标问题是在给定一个计算函数的情况下，将此计算函数计算后得到的结果相同的实体放在一起；
+- 具体问题描述：输入数据为两列，分别是手机号和其访问的网址，目的是统计同一个网址有哪些手机号访问过；
+- 解决方案：map阶段把网址、手机号分别作为key、value传入reduce，由reduce实现分类；
+- 程序：
+
+```
+package wordcountTest;
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
+
+public class WordCount {
+
+  public static class Map 
+            extends Mapper<LongWritable, Text, Text, LongWritable>{
+
+    private final static IntWritable one = new IntWritable(1); // type of output value
+    private Text webPage = new Text();   // type of output key
+    private LongWritable flow = new LongWritable();
+      
+    public void map(LongWritable key, Text value, Context context
+                    ) throws IOException, InterruptedException {
+    	String line = value.toString();
+    	String [] array = line.split(" ");
+    	if(array.length==2){
+    		webPage.set(array[1]);
+    		flow = new LongWritable(Long.parseLong(array[0]));
+    		context.write(webPage,flow);
+    	}/*else{
+    		return;
+    	}*/
+    }
+  }
+  
+  public static class Reduce
+       extends Reducer<Text, LongWritable, Text, LongWritable> {
+
+    private IntWritable result = new IntWritable();
+
+    public void reduce(Text key, Iterable<LongWritable> values, 
+                       Context context
+                       ) throws IOException, InterruptedException {
+
+      for (LongWritable val : values) {
+    	  context.write(key, val);
+      }
+    }
+  }
+
+  // Driver program
+  public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration(); 
+    String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs(); // get all args
+    System.out.println(System.getenv("HADOOP_HOME"));
+    if (otherArgs.length != 2) {
+      System.err.println("Usage: WordCount <in> <out>");
+      System.exit(2);
+    }
+
+    // create a job with name "wordcount"
+    Job job = new Job(conf, "userflow");
+    job.setJarByClass(WordCount.class);
+    job.setMapperClass(Map.class);
+    job.setReducerClass(Reduce.class);
+   
+    // uncomment the following line to add the Combiner
+    // job.setCombinerClass(Reduce.class);
+    // set output key type  
+
+    job.setOutputKeyClass(Text.class);
+    // set output value type
+    job.setOutputValueClass(LongWritable.class);
+    
+    //set reduce number
+    job.setNumReduceTasks(3);
+    //set the HDFS path of the input data
+    FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
+    // set the HDFS path for the output
+    FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+    //Wait till job completion
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+  }
+}
+
+```
+
+- 示例输入输出：
+```
+输入：手机号和网址，用空格分割
+18500000001 sina.com
+18500000002 souhu.com
+18500000003 sina.com
+18500000004 sina.com
+18500000005 souhu.com
+18500000006 github.com
+18500000007 sina.com
+18500000008 github.com
+
+输出：每个网址对应的访问过它的手机号
+github.com 18500000006
+github.com 18500000008
+sina.com 18500000001
+sina.com 18500000003
+sina.com 18500000004
+sina.com 18500000007
+souhu.com 18500000002
+souhu.com 18500000005
+```
+
+
