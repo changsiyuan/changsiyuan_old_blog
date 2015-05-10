@@ -34,6 +34,7 @@ tags : [Hadoop]
 - map的输入固定为<key=这一行的输入在分片文件中的偏移量，value=这一行内容>，输入类型为<object类型，Text类型>，这些都不能随意更改，如需更改，要重写inputFormat；
 
 ### Mapreduce程序参数设置
+
 | 参数        | 设置方法           | 
 | ------------- |:-------------:|
 |不执行reduce函数|job.setNumReduceTasks(0);|
