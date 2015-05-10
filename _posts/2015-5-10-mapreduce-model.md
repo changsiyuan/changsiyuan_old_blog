@@ -219,6 +219,7 @@ public class WordCount {
 ```
 
 - 示例输入输出：
+
 ```
 输入：用户手机号和流量，用空格分割
 13500000000 10
@@ -332,6 +333,7 @@ public class WordCount {
 ```
 
 - 示例输入输出：
+
 ```
 输入：手机号和网址，用空格分割
 18500000001 sina.com
@@ -355,5 +357,129 @@ souhu.com 18500000005
 ```
 
 - 说明：本程序并不能实现将每一个网址放入单独的文件输出，这是因为在“shuffle”过程中，计算出的partitionID相同的key被分到一个reduce中，然而，不同的key的partitionID可能相同，即同一个key肯定被分到同一个reduce，但是同一个reduce中可能有不同的key，所以上述算法不能实现完全分类。关于shuffle请参考我的另一篇博客[Mapreduce过程详解](http://changsiyuan.github.io/hadoop/2015/04/01/mapreduce/)
+
+
+### 过滤（filtering）
+- 问题定义：在数据文件中包含大量的记录，每条记录中包含了某个实体的若干属性，目标问题是在将符合某个条件的记录取出（或进行格式转换）；
+- 具体问题描述：输入文件为三列：手机号、属性、访问网站，目标是将属性为0的记录过滤掉；
+- 解决方案：map中将前两列作为key，最后一列为value，判断属性后输出过滤结果即可，不需要reduce过程；
+- 程序：
+
+```
+package wordcountTest;
+
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
+
+public class WordCount {
+
+	public static class Map extends Mapper<Object, Text, String, Text> {
+
+		private final static IntWritable one = new IntWritable(1); 
+
+		private KVcount user = new KVcount(); // type of output key
+		private Text webPage = new Text();
+
+		public void map(Object key, Text value, Context context
+                    ) throws IOException, InterruptedException {
+
+    	String line = value.toString();
+    	String [] array = line.split(" ");
+    	if(array.length==3){
+    		user.setphoneNum(Long.parseLong(array[0]));
+    		user.setattribute(Integer.parseInt(array[1]));
+    		webPage = new Text(array[2]);
+    		if(user.attribute!=0){
+    			context.write(String.valueOf(user.phoneNum)+"  "+String.valueOf(user.attribute),webPage);
+    		}
+    		
+    	}else{
+    		return;
+    	}
+    }
+	}
+
+	//本程序不需要reduce过程
+	public static class Reduce extends
+			Reducer<KVcount, Text, Text, LongWritable> {
+
+		private IntWritable result = new IntWritable();
+		public void reduce(Text key, Iterable<LongWritable> values,
+				Context context) throws IOException, InterruptedException {
+				
+		}
+	}
+
+	// Driver program
+	public static void main(String[] args) throws Exception {
+		Configuration conf = new Configuration();
+		String[] otherArgs = new GenericOptionsParser(conf, args)
+				.getRemainingArgs(); // get all args
+		System.out.println(System.getenv("HADOOP_HOME"));
+		if (otherArgs.length != 2) {
+			System.err.println("Usage: WordCount <in> <out>");
+			System.exit(2);
+		}
+
+		// create a job with name "wordcount"
+		Job job = new Job(conf, "userflow");
+		job.setJarByClass(WordCount.class);
+		job.setMapperClass(Map.class);
+		// job.setReducerClass(Reduce.class);
+
+		// uncomment the following line to add the Combiner
+		// job.setCombinerClass(Reduce.class);
+		// set output key type
+
+		job.setMapOutputKeyClass(KVcount.class);
+		job.setMapOutputValueClass(Text.class);
+		
+//		job.setOutputKeyClass(Text.class);
+//		// set output value type
+//		job.setOutputValueClass(LongWritable.class);
+
+		// set reduce number
+		job.setNumReduceTasks(0);
+		// set the HDFS path of the input data
+		FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
+		// set the HDFS path for the output
+		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+		// Wait till job completion
+		System.exit(job.waitForCompletion(true) ? 0 : 1);
+	}
+}
+
+```
+
+- 示例输入输出
+
+```
+输入：手机号、属性、网站
+18500000001 0 sina.com
+18500000002 0 souhu.com
+18500000003 1 sina.com
+18500000004 0 sina.com
+18500000005 1 souhu.com
+18500000006 1 github.com
+18500000007 1 sina.com
+18500000008 0 github.com
+
+输出：属性为1的被过滤出来
+18500000003 1 sina.com
+18500000005 1 souhu.com
+18500000006 1 github.com
+18500000007 1 sina.com
+```
 
 
