@@ -37,8 +37,8 @@ tags : [Hadoop]
 
 | 参数        | 设置方法           | 
 | ------------- |:-------------:|
-|不执行reduce函数|job.setNumReduceTasks(0);|
-|设置执行map的类|job.setMapperClass(FlowFilter.class);|
+|不执行reduce函数 |job.setNumReduceTasks(0); |
+|设置执行map的类 |job.setMapperClass(FlowFilter.class); |
 |设置执行combine的类（一般就是reduce类）|job.setCombinerClass(Reduce.class);|
 |设置执行reduce的类|job.setReducerClass(DNTGUserInfoReducer.class);|
 |设置map的数量|job.setNumMapTasks(maps)；|
