@@ -2,6 +2,16 @@
 认真 负责 细致 深入
 
 ---
+### 联系方式
+
+> * 姓名：常思源-Eric Chang；
+> * 所在地：北京-海淀；
+> * Email：changsiyuan2011@126.com；
+> * github：https://github.com/changsiyuan；
+> * blog：http://changsiyuan.github.io/；
+> * 知乎：http://www.zhihu.com/people/EricChang；
+
+---
 
 ### 教育经历
 |时间|学校|专业|学位|
@@ -34,6 +44,7 @@
 ---
 
 ### 其他能力
+- 制作、维护北邮数据科学中心微信公众号；
 - 计算机三级；
 - 驾驶证；
 - 深水证；
