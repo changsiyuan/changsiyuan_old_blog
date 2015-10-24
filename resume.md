@@ -1,13 +1,12 @@
 ### 我的简历
 认真 负责 细致 深入
-下载本简历[常思源的简历](https://github.com/changsiyuan/changsiyuan.github.io/blob/master/resume.md)
 
 ---
 ### 联系方式
 
 > * 姓名：常思源-Eric Chang；
 > * 所在地：北京-海淀；
-> * Email：changsiyuan2011@126.com；
+> * <i class="icon-email"></i>Email：changsiyuan2011@126.com；
 > * github：https://github.com/changsiyuan；
 > * blog：http://changsiyuan.github.io/；
 > * 知乎：http://www.zhihu.com/people/EricChang；
