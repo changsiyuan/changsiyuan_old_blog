@@ -54,7 +54,23 @@ F5：刷新；
 
 F12：开发者工具；
 
+Ctrl+U：查看源代码； 
+
 F11：全屏；
+
+Ctrl+N：打开新窗口；
+
+Alt+F4：关闭当前窗口；
+
+Ctrl+T：打开新标签页；
+
+Ctrl+W：关闭当前标签页或弹出式窗口；
+
+Ctrl+Tab：切换到下一个标签页 ；
+
+Ctrl+Shift+Tab：切换到上一个标签页；
+
+Ctrl+1到Ctrl+8：切换到指定位置编号的标签页；
 
 ## linux系统：
 
@@ -65,6 +81,8 @@ ctrl+alt+L：锁屏
 ## 编程/普通编辑器/IDE：
 
 ctrl+space或alt+/：补全代码
+
+ctrl+p：Show parameters for selected method，函数参数提示；
 
 shift+alt+F：格式化代码
 
@@ -81,6 +99,12 @@ shift+左右箭头：以字符为单位选中；
 ctrl+左右箭头：以单词为单位跳转；
 
 shift+ctrl+左右箭头：以单词为单位选中；
+
+alt+shift+上下箭头：本行和上下行换行；
+
+ctrl+x：删除行；
+
+ctrl+d：复制本行到下一行；
 
 shift+alt+s：自动生成代码（比如get set方法）；
 
