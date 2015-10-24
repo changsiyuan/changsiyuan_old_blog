@@ -63,6 +63,10 @@ ajax（asynchronous javascript and xml）：此技术破除了旧的web框架“
 - php：开源脚本语言，用于小型web开发，服务器端语言，比java的学习成本和复杂度低得多，但是功能有限，比较简陋；
 - java：后台可以用java去写；
 - jsp（Java Server Pages）：动态网页技术标准，用于大型web开发，语言是在html中插入java；
+- servlet：是一种面向底层的jsp；
+- asp：动态服务器页面（Active Server Page），是一种后台编程脚本语言，可以与数据库交互；
+- python：知乎和豆瓣在python写后台；
+- .net：是Microsoft面向XML Web服务的平台，支持的原生语言是c#，.net目前只能运行在windows上；
 
 ### SSH框架
 - Struts2（view）：对浏览器请求处理的一整套框架；
@@ -81,7 +85,8 @@ ajax（asynchronous javascript and xml）：此技术破除了旧的web框架“
 
 ### 服务器软件
 - apache：跨平台，安全性高；
-- tomcat：免费的开放源代码的Web 应用服务器，属于轻量级应用服务器，适合中小企业；
+- tomcat：典型的jsp容器，由apache开源组织开发，免费的开放源代码的Web应用服务器，属于轻量级应用服务器，适合中小企业；
+- jetty：典型的jsp容器，由eclipse基金会开发维护；
 - glassfish：一款强健的商业兼容应用服务器，达到产品级质量，可免费用于开发、部署和重新分发；
 
 ### 数据格式
