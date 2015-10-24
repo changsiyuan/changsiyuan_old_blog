@@ -20,7 +20,7 @@
   - 制作、维护北邮数据科学中心微信公众号；
 
 
-- 如果您想进一步了解我，联系方式如下，欢迎骚扰：
+- 如果您想进一步了解我：
   - 我的邮箱：changsiyuan2011@126.com
   - github：https://github.com/changsiyuan
   - blogs：http://changsiyuan.github.io/
