@@ -21,6 +21,7 @@
 
 
 - 如果您想进一步了解我：
+  - 我的简历：[常思源的简历](https://github.com/changsiyuan/changsiyuan.github.io/blob/master/resume.md)
   - 我的邮箱：changsiyuan2011@126.com
   - github：https://github.com/changsiyuan
   - blogs：http://changsiyuan.github.io/
