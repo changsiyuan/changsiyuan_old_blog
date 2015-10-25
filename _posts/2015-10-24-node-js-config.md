@@ -101,4 +101,14 @@ yum install epel-release
   - sublime text；
   - WebStorm；
 
+### 第一个node程序
+- 在虚拟机上新建文件`test.js`，内容为：
+
+```
+console.log("hello world!")
+```
+
+- 在node运行这个文件`node test.js`
+- 执行结果为`hello world!`，终于实现了在server端运行javascript的梦想！
+
 
