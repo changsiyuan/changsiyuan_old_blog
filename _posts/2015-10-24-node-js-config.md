@@ -38,4 +38,28 @@ tags : [node.js]
   - 在虚拟机上安装Redis和MongoDB；
 - 下面会一一讲解这些步骤；
 
+### VirtualBox的安装
+- [下载VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+- 直接双击安装即可；
+
+### 在VirtualBox中创建虚拟机
+- 内存分配1024M；
+- 磁盘种类选择默认种类；
+- 安装CentOs basic web server版本，同时安装development tolls；
+- CentOs7的iso镜像文件可从网上下载，添加到虚拟机配置中；
+- 如果你所在的局域网路由器DHCP功能启用了，就设置网卡为桥接网卡，系统会自动分配IP地址；
+- 如果你所在的局域网路由器DHCP功能禁用了，就设置网卡为NAT模式，需要进一步进行端口映射的配置（下面会将具体配置方法）；
+- 安装完reboot虚拟机；
+
+### 虚拟机的配置
+- 网卡自启动的配置：
+  - 进入下列配置文件，并将最后一行ONBOOT设置为yes；
+
+```
+vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+```
+
+- 
+
+
 
