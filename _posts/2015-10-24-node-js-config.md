@@ -59,7 +59,43 @@ tags : [node.js]
 vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
 ```
 
-- 
+- 如果你所在的局域网路由器DHCP功能启用了，此时就可通过`ifconfig`命令查询到ipv4地址，记下这个地址（当然你可以将它和它对应的域名配置到host文件中）；
+- 如果你所在的局域网路由器DHCP功能禁用了，此时就将虚拟机网卡配置改为NAT网络模式，点击“端口转发按钮”，按照下图方式配置端口映射，这个设置的意思是，只要是访问本机（127.0.0.1）5905端口的消息全部转发给ip为10.0.2.15（这个ip是在虚拟机上运行`ifconfig`得到的，这是虚拟机在NAT模式下自行分配的ip）的22端口（SSH专用端口为22）；
+- 安装epel：
 
+```
+yum install epel-release
+```
+
+### xShell和xFtp安装
+- 介绍：
+  - xShell是一款在windows上连接远程终端的软件，类似于SecureCRT，这里我们用它来连接本机上的虚拟机；
+  - xFtp用来在windows PC和linux终端间传输文件，这里我们用xFtp来实现本机和上面CentOs之间的文件传输；
+- xShell安装：
+  - 下载地址（需先注册获取下载链接）：https://www.netsarang.com/xshell_download.html；
+  - 下载后双击安装即可；
+- xFtp安装：
+  - 下载地址（需先注册获取下载链接）：https://www.netsarang.com/download/down_xfp.html；
+  - 下载后双击安装即可；
+- xShell连接虚拟机：
+  - 如果你所在的局域网路由器DHCP功能启用了，直接连接虚拟机的ipv4地址（通过`ifconfig`命令查询到），端口22；
+  - 如果你所在的局域网路由器DHCP功能禁用了，此时连接127.0.0.1，端口5905，系统会自动根据上面的配置将数据映射到虚拟机；
+  - 连接成功后，输入用户名密码即可登录虚拟机；
+
+### 在虚拟机上安装相应软件
+- 安装Nodejs
+  - 安装`yum install nodejs`
+  - 查看是否正常安装`node --version`
+- 安装MongoDB
+  - 安装`yum install mongodb-server`（mongodb服务器端）`yum install mongodb`（mongodb客户端）
+  - 查看是否正常安装`mongo --version`
+- 安装redis
+  - 安装`yum install redis`
+  - 查看是否正常安装`redis-cli --version`
+
+### 在windows安装相应软件
+- 应当安装下列IDE或编辑器，不再赘述：
+  - sublime text；
+  - WebStorm；
 
 
