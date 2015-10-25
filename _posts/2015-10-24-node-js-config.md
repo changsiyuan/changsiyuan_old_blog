@@ -9,6 +9,12 @@ tags : [node.js]
 
 ### 什么是node.js
 - 维基百科的介绍：Node.js是谷歌V8引擎、libuv平台抽象层以及主体使用Javscript编写的核心库三者集合的一个包装外壳；
+- node.js在国内外的使用情况：
+  - linkedin移动版正在向node.js迁移；
+  - twitter的消息队列用node.js实现；
+  - 知乎、网易的推送信息用node.js实现；
+  - 阿里的云计算平台也要部分向node.js迁移；
+  - .....
 - 上面的介绍听起来很抽象，其实，node.js就是一个能够在服务器端运行javascript的框架，实现了众多web开发者在server端使用javascript开发的梦想；
 - node.js有很多优势，比如：
   - 模块化；
@@ -22,6 +28,14 @@ tags : [node.js]
   - 数据流传输；
   - 代理；
   - 只要是符合“计算简单、高并发、需要client和server双向通信”的业务模型都可以用！
-- 本文重点介绍了node.js的开发环境搭建；
+- 本文重点介绍了node.js在windows下的开发环境搭建；
+
+### node.js开发环境配置
+- node.js开发环境需要配置如下内容：
+  - 在windows上安装Sublime和Webstorm；
+  - 在windows上安装VirtualBox和Centos虚拟机；
+  - 在windows上安装xShell和xFtp，方便在本机和虚拟机之间传送消息或文件；
+  - 在虚拟机上安装Redis和MongoDB；
+- 下面会一一讲解这些步骤；
 
 
