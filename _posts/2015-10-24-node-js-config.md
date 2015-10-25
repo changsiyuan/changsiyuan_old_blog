@@ -61,6 +61,9 @@ vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
 
 - 如果你所在的局域网路由器DHCP功能启用了，此时就可通过`ifconfig`命令查询到ipv4地址，记下这个地址（当然你可以将它和它对应的域名配置到host文件中）；
 - 如果你所在的局域网路由器DHCP功能禁用了，此时就将虚拟机网卡配置改为NAT网络模式，点击“端口转发按钮”，按照下图方式配置端口映射，这个设置的意思是，只要是访问本机（127.0.0.1）5905端口的消息全部转发给ip为10.0.2.15（这个ip是在虚拟机上运行`ifconfig`得到的，这是虚拟机在NAT模式下自行分配的ip）的22端口（SSH专用端口为22）；
+
+![port-map](https://github.com/changsiyuan/changsiyuan.github.io/blob/master/_image/port-map.png)
+
 - 安装epel：
 
 ```
