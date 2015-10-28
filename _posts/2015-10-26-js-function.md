@@ -35,3 +35,45 @@ var x = 1
 var func2 = new Function(x,alert(x));  
 ```
 
+### javascript函数的调用
+- 直接通过函数名调用：
+
+```
+function test(){   
+    alert("...");
+}
+
+test();          
+window.onload = test();
+```
+
+- 通过变量调用：
+
+```
+function test(){   
+    alert("...");
+}
+
+var fun = test;  
+fun();
+```
+
+- 下面两种方法可让函数自动执行
+
+```
+(function test(){   
+    alert("...");
+})()
+
+(function test(){   
+    alert("...");
+}())
+```
+
+- 下面的代码会发生错误，请注意括号
+
+```
+function test(){   //error
+	alert("...");
+}()
+```
