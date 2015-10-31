@@ -61,32 +61,28 @@ tags : [Web]
 
 ### 几种跨域访问策略和原理
 - document.domain
-
-> 浏览器在检测是否同源时肯定要检测域名是否相同，它是通过`document.domain`属性来获取当前页面域名的；
-`document.domain`属性不能随便更改，但可以通过js将`document.domain`属性设置为当前`document.domain`属性值的后缀；
-例如，假设在 `http://store.company.com/dir/other.html`中的一个脚本执行了下列语句`document.domain = "company.com"`，这条语句执行之后，浏览器将会成功地通过对`http://company.com/dir/page.html`的同源检测，但不能设置 `document.domain为othercompany.com.`；
-如果需要跨域访问的网站和本网站端口、协议均相同，只有域名不同，而且需要跨域访问的网站的域名是本网站的后缀，则可以使用`document.domain`暂时更改当前document对象的域名值，实现跨域访问；
-此种跨域访问限制颇多，空间上，只能跨域访问协议、端口相同的且域名是本网站后缀的网站，时间上，一旦原网站重新刷新页面，`document.domain`值恢复原状，不能继续跨域访问，所以这种跨域访问策略只能算是局部的、暂时的、基础域名相同的网站间的跨域访问；
+  - 浏览器在检测是否同源时肯定要检测域名是否相同，它是通过`document.domain`属性来获取当前页面域名的；
+  - `document.domain`属性不能随便更改，但可以通过js将`document.domain`属性设置为当前`document.domain`属性值的后缀；
+  - 例如，假设在 `http://store.company.com/dir/other.html`中的一个脚本执行了下列语句`document.domain = "company.com"`，这条语句执行之后，浏览器将会成功地通过对`http://company.com/dir/page.html`的同源检测，但不能设置 `document.domain为othercompany.com.`；
+  - 如果需要跨域访问的网站和本网站端口、协议均相同，只有域名不同，而且需要跨域访问的网站的域名是本网站的后缀，则可以使用`document.domain`暂时更改当前document对象的域名值，实现跨域访问；
+  - 此种跨域访问限制颇多，空间上，只能跨域访问协议、端口相同的且域名是本网站后缀的网站，时间上，一旦原网站重新刷新页面，`document.domain`值恢复原状，不能继续跨域访问，所以这种跨域访问策略只能算是局部的、暂时的、基础域名相同的网站间的跨域访问；
 
 - window.name
-
-> 浏览器一个窗口（标签页）的`window.name`属性在时间上是全局的，无论一个窗口中的页面如何跳转，`window.name`属性不变;
-可以看到，如果在一个标签里面跳转网页的话，我们的 `window.name` 是不会改变的；
-由于安全原因，浏览器始终会保持 `window.name` 是string类型；
-`window.name`比`document.domain`更强大，可以从任意页面获取string类型的数据；
+  - 浏览器一个窗口（标签页）的`window.name`属性在时间上是全局的，无论一个窗口中的页面如何跳转，`window.name`属性不变;
+  - 可以看到，如果在一个标签里面跳转网页的话，我们的 `window.name` 是不会改变的；
+  - 由于安全原因，浏览器始终会保持 `window.name` 是string类型；
+  - `window.name`比`document.domain`更强大，可以从任意页面获取string类型的数据；
 
 - JSONP
-
-> JSONP是一种依靠开发人员的聪明才智创造出的一种非官方跨域数据交互协议；
-JSONP本质是利用了`<script><img><iframe>`等标签可跨预加载脚本的特性实现数据跨域传输；
-本地的js代码将需要请求的数据包装好（如需要***号的***飞机票数据），发送到远端js，远端js依据本地js提供的信息获取相应的数据传回到本地js；
-JSONP 的理念就是，我和服务端约定好一个函数名，当我请求文件的时候，服务端返回一段 JavaScript，这段 JavaScript 调用了我们约定好的函数，并且将数据当做参数传入；
+  - JSONP是一种依靠开发人员的聪明才智创造出的一种非官方跨域数据交互协议；
+  - JSONP本质是利用了`<script><img><iframe>`等标签可跨预加载脚本的特性实现数据跨域传输；
+  - 本地的js代码将需要请求的数据包装好（如需要***号的***飞机票数据），发送到远端js，远端js依据本地js提供的信息获取相应的数据传回到本地js；
+  - JSONP 的理念就是，我和服务端约定好一个函数名，当我请求文件的时候，服务端返回一段 JavaScript，这段 JavaScript 调用了我们约定好的函数，并且将数据当做参数传入；
 
 - postMessage
-
-> postMessage()方法允许来自不同源的脚本（无视协议，端口，域名的不同）采用异步方式进行有限的通信，可以实现跨文本档、多窗口、跨域消息传递；
-`postMessage(data,origin)`方法接受两个参数：
-data:要传递的数据，html5规范中提到该参数可以是JavaScript的任意基本类型或可复制的对象，然而并不是所有浏览器都做到了这点儿，部分浏览器只能处理字符串参数，所以我们在传递参数的时候需要使用JSON.stringify()方法对对象参数序列化，在低版本IE中引用json2.js可以实现类似效果；
-origin：字符串参数，指明目标窗口的源，协议+主机+端口号[+URL]，URL会被忽略，所以可以不写，这个参数是为了安全考虑，postMessage()方法只会将message传递给指定窗口，当然如果愿意也可以建参数设置为"*"，这样可以传递给任意窗口，如果要指定和当前窗口同源的话设置为"/"；
+  - postMessage()方法允许来自不同源的脚本（无视协议，端口，域名的不同）采用异步方式进行有限的通信，可以实现跨文本档、多窗口、跨域消息传递；
+  - `postMessage(data,origin)`方法接受两个参数：
+  - data:要传递的数据，html5规范中提到该参数可以是JavaScript的任意基本类型或可复制的对象，然而并不是所有浏览器都做到了这点儿，部分浏览器只能处理字符串参数，所以我们在传递参数的时候需要使用JSON.stringify()方法对对象参数序列化，在低版本IE中引用json2.js可以实现类似效果；
+  - origin：字符串参数，指明目标窗口的源，协议+主机+端口号[+URL]，URL会被忽略，所以可以不写，这个参数是为了安全考虑，postMessage()方法只会将message传递给指定窗口，当然如果愿意也可以建参数设置为"*"，这样可以传递给任意窗口，如果要指定和当前窗口同源的话设置为"/"；
 
 
