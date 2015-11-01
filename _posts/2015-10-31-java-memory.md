@@ -8,6 +8,9 @@ tags : [Java]
 {% include JB/setup %}
 
 ### JVM运行时数据区
+
+![jvm](https://raw.githubusercontent.com/changsiyuan/changsiyuan.github.io/master/_image/jvm.jpeg)
+
 - 程序计数器：存放线程执行位置（main函数也是一个线程）；
 - 虚拟机栈（栈内存）：
   - 生命周期和对应的线程相同，存放该线程的局部变量、对象的引用；
