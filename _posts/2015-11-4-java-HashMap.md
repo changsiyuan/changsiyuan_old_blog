@@ -56,7 +56,7 @@ public class Entry<K, V> {
 
 ```
 
-### MyHashMap类，实现HashMap大部分方法
+- MyHashMap类，实现HashMap大部分方法
 
 ```
 package MyHashMap;
@@ -227,7 +227,7 @@ public class MyHashMap<K, V> {
 
 ```
 
-### TestMyHashMap测试类
+- TestMyHashMap测试类
 
 ```
 package MyHashMap;
